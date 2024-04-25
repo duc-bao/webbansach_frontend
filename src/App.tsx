@@ -1,26 +1,21 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import Navbar from "./layout/header-footer/Navbar";
+import Footer from "./layout/header-footer/Footer";
+import HomePage from "./layout/homePage/HomePage";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [keywordSearch, setKeywordSearch] = useState('');
+    return (
+        <div className="App">
+            <Navbar
+                keywordSearch= {keywordSearch}
+                setKeywordSearch={setKeywordSearch}
+            ></Navbar>
+            <HomePage
+                keywordSearch = {keywordSearch}
+            ></HomePage>
+            <Footer></Footer>
+        </div>
+    );
 }
-
 export default App;

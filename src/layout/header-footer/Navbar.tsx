@@ -1,4 +1,8 @@
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
+import Category from "../../models/CategoryModel";
+import CategoryModel from "../../models/CategoryModel";
+import { getAllGenre } from "../../api/GenreAPI";
+import { Link, NavLink } from "react-router-dom";
 interface NavbarProps {
     keywordSearch: string;
     setKeywordSearch: (keyword: string) => void;
@@ -12,14 +16,29 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
     const handleSearch = () => {
         setKeywordSearch(temporary);
     };
+    const [genreList, setGenreList] = useState<CategoryModel[]>([]);
+    const [erroring, setErroring] = useState(null);
+    useEffect(() => {
+        getAllGenre()
+            .then((response) => {
+                setGenreList(response.genreList);
+            })
+            .catch((error) => {
+                setErroring(error.message);
+            });
+    }, []);
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
             <div className="container-fluid">
-                <a className="navbar-brand" href="#">
-                    Bookstore
-                </a>
-
+                <Link className="navbar-brand mt-2 mt-lg-0" to="/">
+                    <img
+                        src="https://images.vexels.com/media/users/3/150469/raw/8b434a38a07aa9a18c988088cca1dccc-book-store-logo-template.jpg"
+                        width="50"
+                        alt="MDB Logo"
+                        loading="lazy"
+                    />
+                </Link>
                 <button
                     className="navbar-toggler"
                     type="button"
@@ -37,13 +56,13 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                 >
                     <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                         <li className="nav-item">
-                            <a
-                                href="#"
-                                className="nav-link active"
+                            <NavLink
+                                className="nav-link"
                                 aria-current="page"
+                                to = '/'
                             >
                                 Trang chủ
-                            </a>
+                            </NavLink>
                         </li>
                         <li className="nav-item dropdown">
                             <a
@@ -56,64 +75,31 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                             >
                                 Thể loại sách
                             </a>
-                            <ul
-                                className="dropdown-menu"
-                                aria-labelledby="navbarDropdown1"
-                            >
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Thể loại 1
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Thể loại 2
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Thể loại 3
-                                    </a>
-                                </li>
+                            <ul className="dropdown-menu">
+                                {genreList.map((genre, index) => {
+                                    return (
+                                        <li key={index}>
+                                            <Link
+                                                className="dropdown-item"
+                                                to={`/search/${genre.idCategory}`}
+                                            >
+                                                {genre.nameCategory}
+                                            </Link>
+                                        </li>
+                                    );
+                                })}
                             </ul>
                         </li>
-                        <li className="nav-item dropdown">
-                            <a
-                                href="#"
-                                className="nav-link dropdown-toggle"
-                                id="navbarDropdown2"
-                                role="button"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Chính sách
-                            </a>
-                            <ul
-                                className="dropdown-menu"
-                                aria-labelledby="navbarDropdown2"
-                            >
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Quy định 1
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Quy định 2
-                                    </a>
-                                </li>
-                                <li>
-                                    <a href="#" className="dropdown-item">
-                                        Quy định 3
-                                    </a>
-                                </li>
-                            </ul>
-                        </li>
-                        <li className="nav-item">
-                            <a href="#" className="nav-link">
-                                Liên hệ
-                            </a>
-                        </li>
+                        <li className='nav-item'>
+							<NavLink className='nav-link' to='/about'>
+								Giới thiệu
+							</NavLink>
+						</li>
+                        <li className='nav-item'>
+							<NavLink className='nav-link' to='/search'>
+								Kho sách
+							</NavLink>
+						</li>
                     </ul>
                 </div>
                 {/* Tim kiem */}

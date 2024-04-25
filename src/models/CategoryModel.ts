@@ -1,4 +1,4 @@
-class Category{
+class CategoryModel{
     idCategory: number
     nameCategory: string
     constructor(idCategory: number, nameCategory: string){
@@ -6,4 +6,4 @@ class Category{
         this.nameCategory = nameCategory;
     }
 }
-export default Category;
+export default CategoryModel;

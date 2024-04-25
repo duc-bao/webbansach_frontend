@@ -2,19 +2,35 @@ import React, { useState } from "react";
 import Navbar from "./layout/header-footer/Navbar";
 import Footer from "./layout/header-footer/Footer";
 import HomePage from "./layout/homePage/HomePage";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import About from "./layout/About/About";
+import FilterPage from "./layout/page/FilterPage";
 
 function App() {
-    const [keywordSearch, setKeywordSearch] = useState('');
+    const [keywordSearch, setKeywordSearch] = useState("");
     return (
         <div className="App">
-            <Navbar
-                keywordSearch= {keywordSearch}
-                setKeywordSearch={setKeywordSearch}
-            ></Navbar>
-            <HomePage
-                keywordSearch = {keywordSearch}
-            ></HomePage>
-            <Footer></Footer>
+            <BrowserRouter>
+                <Navbar
+                    keywordSearch={keywordSearch}
+                    setKeywordSearch={setKeywordSearch}
+                ></Navbar>
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <HomePage keywordSearch={keywordSearch}></HomePage>
+                        }
+                    />
+                    <Route
+                        path="/search/:idGenreParam"
+                        element={<FilterPage />}
+                    />
+                    <Route path='/search' element={<FilterPage />} />
+                    <Route path="/about" element={<About></About>} />
+                </Routes>
+                <Footer></Footer>
+            </BrowserRouter>
         </div>
     );
 }

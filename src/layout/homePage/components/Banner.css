@@ -20,7 +20,13 @@
 	/* animation-timing-function: step-end; */
 	white-space: nowrap;
 }
-
+@media (max-width: 768px) {
+    .banner-text {
+		font-size: 14px; /* Điều chỉnh kích thước font cho thiết bị mobile */
+        letter-spacing: normal; /* Gỡ bỏ khoảng cách giữa các ký tự */
+        animation: none;
+    }
+}
 @keyframes type {
 	0% {
 		width: 0;

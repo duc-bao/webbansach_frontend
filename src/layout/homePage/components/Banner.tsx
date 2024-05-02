@@ -4,7 +4,7 @@ import "./Banner.css";
 function Banner(){
     return(
         <div className='container-fluid pt-5 pb-4 text-dark d-flex justify-content-center align-items-center'>
-			<div>
+			<div className=" col-sm-12 text-center" >
 				<h3
 					data-text='A room without books is like a body without a soul.'
 					className='banner-text display-5 fw-bold'

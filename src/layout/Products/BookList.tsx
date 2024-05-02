@@ -116,11 +116,15 @@ const DanhSachSanPham: React.FC<BookListProps> = (props) => {
     }
     return (
         <div className="container">
-            <div className="row mt-4 mb-4">
-                {bookList.map((book) => (
-                    <BookProps key={book.idBook} book={book}></BookProps>
-                ))}
-            </div>
+            <div className='container-book container mb-5 pb-5 px-5 bg-light'>
+			<h2 className='mt-4 px-3 py-3 mb-0'>DANH SÁCH SẢN PHẨM</h2>
+			<hr className='mt-0' />
+			<div className='row'>
+				{bookList.map((book) => (
+					<BookProps key={book.idBook} book={book} />
+				))}
+			</div>
+		</div>
             {props.paginable ? (
                 <>
                     <hr className="mt-5" style={{ color: "#aaa" }} />

@@ -21,7 +21,7 @@ function HomePage({keywordSearch}:HomePageProps){
 			</div>
         {/* <Carousel></Carousel> */}
         {/* Sách hót */}
-        {/* <HotBookList></HotBookList> */}
+        <HotBookList></HotBookList>
         <BookList
         keywordSearch = {keywordSearch}
         ></BookList>

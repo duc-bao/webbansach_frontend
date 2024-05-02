@@ -17,5 +17,8 @@ export async function getGenre(endpoint:string):Promise<resultInterface> {
 export async function getAllGenre():Promise<resultInterface> {
     const url = "http://localhost:8080/categories?sort=idCategory";
     return getGenre(url);
-    
+}
+export async function getGenreByIdBook(idBook:number):Promise<resultInterface>{
+    const url = `http://localhost:8080/books/${idBook}/categoryList`;
+    return getGenre(url);
 }

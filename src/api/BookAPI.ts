@@ -53,10 +53,12 @@ export async function get3Book(): Promise<resultInterface> {
         "http://localhost:8080/books?sort=idBook,desc&page=0&size=3";
     return getBook(url);
 }
-export async function searchBookAll(keywordSearch?:string):Promise<resultInterface>{
-    let url = `http://localhost:8080/books?sort=idBook,desc&size=8&page=0`
-    if(keywordSearch !== ''){
-        url = `http://localhost:8080/books/search/findByNameContaining?sort=idBook,desc&size=8&page=0&nameBook=${keywordSearch}`
+export async function searchBookAll(
+    keywordSearch?: string
+): Promise<resultInterface> {
+    let url = `http://localhost:8080/books?sort=idBook,desc&size=8&page=0`;
+    if (keywordSearch !== "") {
+        url = `http://localhost:8080/books/search/findByNameContaining?sort=idBook,desc&size=8&page=0&nameBook=${keywordSearch}`;
     }
     return getBook(url);
 }
@@ -65,12 +67,12 @@ export async function searchBook(
     idGenre?: number,
     filter?: number,
     size?: number,
-    page?: number,
+    page?: number
 ): Promise<resultInterface> {
     // Nếu key search không undifined
     if (keySearch) {
         keySearch = keySearch.trim();
-    }   
+    }
     const optionsShow = `size=${size}&page=${page}`;
     let url: string = `http://localhost:8080/books?${optionsShow}`;
     let filterEndpoint = "";
@@ -85,28 +87,68 @@ export async function searchBook(
     } else if (filter === 5) {
         filterEndpoint = "sort=soldQuantity,desc";
     }
-      // Nếu có key search và không có lọc thể loại
-   
-    if(keySearch !== ''){
-        url = `http://localhost:8080/books/search/findByNameContaining?nameBook=${keySearch}&${optionsShow}&${filterEndpoint}`
+    // Nếu có key search và không có lọc thể loại
+
+    if (keySearch !== "") {
+        url = `http://localhost:8080/books/search/findByNameContaining?nameBook=${keySearch}&${optionsShow}&${filterEndpoint}`;
     }
     // Nếu idGenre không undifined
-    if(idGenre !== undefined){
-         // Nếu có không có key search và có lọc thể loại
-        if(keySearch === '' && idGenre > 0){
-            url = `http://localhost:8080/books/search/findByCategoryList_IdCategory?idCategory=${idGenre}&${optionsShow}`
+    if (idGenre !== undefined) {
+        // Nếu có không có key search và có lọc thể loại
+        if (keySearch === "" && idGenre > 0) {
+            url = `http://localhost:8080/books/search/findByCategoryList_IdCategory?idCategory=${idGenre}&${optionsShow}`;
         }
         // Chỉ lọc filter
-        if(keySearch === '' &&(idGenre === 0 || typeof(idGenre) === 'string')){
-            url = `http://localhost:8080/books?${optionsShow}&${filterEndpoint}`
+        if (
+            keySearch === "" &&
+            (idGenre === 0 || typeof idGenre === "string")
+        ) {
+            url = `http://localhost:8080/books?${optionsShow}&${filterEndpoint}`;
         }
-    }   
+    }
     return getBook(url);
 }
 
-
-//Lấy danh sách sách hot ra 
-export async function getHotBook():Promise<resultInterface> {
-    const url = "http://localhost:8080/books?sort=avgRating,desc&size=4"
+//Lấy danh sách sách hot ra
+export async function getHotBook(): Promise<resultInterface> {
+    const url = "http://localhost:8080/books?sort=avgRating,desc&size=4";
     return getBook(url);
+}
+
+export async function getBookId(idBook: number): Promise<BookModel | null> {
+    
+    let bookResponse: BookModel = {
+        idBook: 0,
+        nameBook: "",
+        author: "",
+        description: "",
+        listPrice: NaN,
+        sellPrice: NaN,
+        quantity: NaN,
+        avgRating: NaN,
+        soldQuantity: NaN,
+        discountPercent: NaN,
+        thumbnail: "",
+    };
+    const url: string = `http://localhost:8080/books/${idBook}`;
+    try {
+        // Gọi phương thức request()
+        const request = await my_request(url);
+        // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
+        if (request) {
+            bookResponse = request;
+            // Trả về quyển sách
+            const responseImg = await GetAllImage(request.idBook);
+            const thumbnail = responseImg.filter((image) => image.icon);
+            return {
+                ...bookResponse,
+                thumbnail: thumbnail[0].linkImg,
+            };
+        } else {
+            throw new Error("Sách không tồn tại");
+        }
+    } catch (error) {
+        console.error("Error: ", error);
+        return null;
+    }
 }

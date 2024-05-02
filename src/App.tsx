@@ -5,6 +5,7 @@ import HomePage from "./layout/homePage/HomePage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import About from "./layout/About/About";
 import FilterPage from "./layout/page/FilterPage";
+import BookDetail from "./layout/Products/BookDetail";
 
 function App() {
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -26,8 +27,12 @@ function App() {
                         path="/search/:idGenreParam"
                         element={<FilterPage />}
                     />
-                    <Route path='/search' element={<FilterPage />} />
+                    <Route path="/search" element={<FilterPage />} />
                     <Route path="/about" element={<About></About>} />
+                    <Route
+                        path="/book/:idBook"
+                        element={<BookDetail></BookDetail>}
+                    />
                 </Routes>
                 <Footer></Footer>
             </BrowserRouter>

@@ -18,10 +18,17 @@ import ImageViewer from "react-simple-image-viewer";
 import useScrollToTop from "../hooks/ScrollToTop";
 import TextEllipsis from "./components/text-elip/TextElipsis";
 import Comment from "./components/Comment";
-interface BookDetailInterface {}
+import { toast } from "react-toastify";
+import CartItemModel from "../../models/CartItemModel";
+import { useCartItem } from "../utils/CartItemContext";
+interface BookDetailProps {
+	totalCart: number;
+	setTotalCart: any;
+}
 
-const BookDetail: React.FC<BookDetailInterface> = (props) => {
+const BookDetail: React.FC<BookDetailProps> = (props) => {
     useScrollToTop(); // Mỗi lần vào component này thì sẽ ở trên cùng
+    const { setTotalCart, cartList } = useCartItem();
     // Lấy mã sách từ param
     const { idBook } = useParams();
     let idBookNumber: number = 0;
@@ -115,7 +122,80 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
         setCurrentImage(0);
         setIsViewerOpen(false);
     };
+    // Xử lý thêm sản phẩm vào giỏ hàng
+    const handleAddProduct = async (newBook: BookModel) => {
+        // cái isExistBook này sẽ tham chiếu đến cái cart ở trên, nên khi update thì cart nó cũng update theo
+        let isExistBook = cartList.find(
+			(cartItem) => cartItem.book.idBook === newBook.idBook
+		);
+        // Thêm 1 sản phẩm vào giỏ hàng
+        if (isExistBook) {
+            // nếu có rồi thì sẽ tăng số lượng
+            isExistBook.quantity += quantity;
 
+            // Lưu vào db
+            // if (isToken()) {
+            //     const request = {
+            //         idCart: isExistBook.idCart,
+            //         quantity: isExistBook.quantity,
+            //     };
+            //     const token = localStorage.getItem("token");
+            //     fetch(endpointBE + `/cart-item/update-item`, {
+            //         method: "PUT",
+            //         headers: {
+            //             Authorization: `Bearer ${token}`,
+            //             "content-type": "application/json",
+            //         },
+            //         body: JSON.stringify(request),
+            //     }).catch((err) => console.log(err));
+            // }
+        } else {
+            // Lưu vào db
+            // if (isToken()) {
+            //     try {
+            //         const request = [
+            //             {
+            //                 quantity: quantity,
+            //                 book: newBook,
+            //                 idUser: getIdUserByToken(),
+            //             },
+            //         ];
+            //         const token = localStorage.getItem("token");
+            //         const response = await fetch(
+            //             endpointBE + "/cart-item/add-item",
+            //             {
+            //                 method: "POST",
+            //                 headers: {
+            //                     Authorization: `Bearer ${token}`,
+            //                     "content-type": "application/json",
+            //                 },
+            //                 body: JSON.stringify(request),
+            //             }
+            //         );
+            //         if (response.ok) {
+            //             const idCart = await response.json();
+            //             cartList.push({
+            //                 idCart: idCart,
+            //                 quantity: quantity,
+            //                 book: newBook,
+            //             });
+            //         }
+            //     } catch (error) {
+            //         console.log(error);
+            //     }
+            // } else {
+            //     cartList.push({
+            //         quantity: quantity,
+            //         book: newBook,
+            //     });
+            // }
+        }
+        // Lưu vào localStorage
+        localStorage.setItem("cart", JSON.stringify(cartList));
+        // Thông báo toast
+        toast.success("Thêm vào giỏ hàng thành công");
+        setTotalCart(cartList.length);
+    };
     if (loadData) {
         return (
             <div className="container-book container mb-5 py-5 px-5 bg-light">
@@ -148,7 +228,7 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
             <>
                 <div className="container p-2 bg-white my-3 rounded">
                     <div className="row mt-4 mb-4">
-                        <div className="col-lg-4 col-md-4 col-sm-12">
+                        <div className="col-lg-3 col-md-3 col-sm-12">
                             <Carousel
                                 emulateTouch={true}
                                 swipeable={true}
@@ -198,8 +278,9 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
                                 />
                             )}
                         </div>
-                        <div className="col-lg-8 col-md-8 col-sm-12 px-5">
-                            <h2>{book?.nameBook}</h2>
+
+                        <div className="col-lg-6 col-md-6 col-sm-12 px-3">
+                            {book && <h2>{book?.nameBook}</h2>}
                             <div className="d-flex align-items-center">
                                 <p className="me-5">
                                     Thể loại:{" "}
@@ -283,7 +364,18 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
                                         Miễn phí vận chuyển
                                     </span>
                                 </div>
+                                <div className=" bg-white mt-5 rounded">
+                                    <h5 className="my-3">Mô tả sản phẩm</h5>
+                                    <hr />
+                                    <TextEllipsis
+                                        isShow={true}
+                                        text={book?.description + ""}
+                                        limit={5000}
+                                    />
+                                </div>
                             </div>
+                        </div>
+                        <div className="col-lg-3 col-md-3 col-sm-12 ">
                             <div className="d-flex align-items-center mt-3">
                                 <strong className="me-5">Số lượng: </strong>
                                 <SelectQuantity
@@ -293,11 +385,23 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
                                     add={add}
                                     reduce={reduce}
                                 />
-                                <span className="ms-4">
-                                    {book?.quantity} sản phẩm có sẵn
-                                </span>
                             </div>
-                            <div className="mt-4 d-flex align-items-center">
+                            <div className="mt-2 text-start">
+                                <strong style={{ fontSize: "32px" }}>
+                                    Số tiền tạm tính
+                                </strong>{" "}
+                                <br />
+                                <h4>
+                                    {" "}
+                                    {book && book.sellPrice
+                                        ? (
+                                              quantity * book.sellPrice
+                                          ).toLocaleString() + "đ"
+                                        : "Price Unavailable"}
+                                </h4>
+                            </div>
+
+                            <div className="d-grid gap-2">
                                 {book?.quantity === 0 ? (
                                     <Button
                                         variant="outlined"
@@ -309,38 +413,36 @@ const BookDetail: React.FC<BookDetailInterface> = (props) => {
                                     </Button>
                                 ) : (
                                     <>
-                                        <Button
-                                            variant="outlined"
-                                            size="large"
-                                            startIcon={<ShoppingCartOutlined />}
-                                            className="me-3"
-                                            // onClick={() => handleAddProduct(book)}
-                                        >
-                                            Thêm vào giỏ hàng
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            size="large"
-                                            className="ms-3"
-                                            // onClick={() => handleBuyNow(book)}
-                                        >
-                                            Mua ngay
-                                        </Button>
+                                        {book && (
+                                            <>
+                                                <Button
+                                                    variant="outlined"
+                                                    size="large"
+                                                    startIcon={
+                                                        <ShoppingCartOutlined />
+                                                    }
+                                                    className="me-3"
+                                                    onClick={() => props.setTotalCart(props.totalCart + 1)}
+                                                >
+                                                    Thêm vào giỏ hàng
+                                                </Button>
+                                                <Button
+                                                    variant="contained"
+                                                    size="large"
+                                                    className="me-3"
+                                                    // onClick={() => handleBuyNow(book)}
+                                                >
+                                                    Mua ngay
+                                                </Button>
+                                            </>
+                                        )}
                                     </>
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
-                <div className="container p-4 bg-white my-3 rounded">
-                    <h5 className="my-3">Mô tả sản phẩm</h5>
-                    <hr />
-                    <TextEllipsis
-                        isShow={true}
-                        text={book?.description + ""}
-                        limit={2000}
-                    />
-                </div>
+
                 <div className="container p-4 bg-white my-3 rounded">
                     <h5 className="my-3">Khách hàng đánh giá</h5>
                     <hr />

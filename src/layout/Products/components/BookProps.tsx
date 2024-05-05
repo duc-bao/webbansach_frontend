@@ -7,11 +7,13 @@ import { GetAllImage } from "../../../api/ImageAPI";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import TextEllipsis from "./text-elip/TextElipsis";
 import { Link } from "react-router-dom";
+import CartItemModel from "../../../models/CartItemModel";
 
 interface BookPropInterface {
     book: BookModel;
+	setTotalCart: any; 
 }
-const BookProps: React.FC<BookPropInterface> = ({ book }) => {
+const BookProps: React.FC<BookPropInterface> = ({ book ,setTotalCart}) => {
     const [imageList, setImageList] = useState<ImageModel[]>([]);
     const [loadData, setLoadData] = useState(true);
     const [errors, setError] = useState(null);
@@ -26,6 +28,27 @@ const BookProps: React.FC<BookPropInterface> = ({ book }) => {
                 setError(errors.message);
             });
     }, []);
+	const handleAddProduct = (newBook: BookModel) => {
+		const cartData: string | null = localStorage.getItem("cart");
+		const cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
+		// cái isExistBook này sẽ tham chiếu đến cái cart ở trên, nên khi update thì cart nó cũng update theo
+		let isExistBook = cart.find(
+			(cartItem) => cartItem.book.idBook === newBook.idBook
+		);
+		// Thêm 1 sản phẩm vào giỏ hàng
+		if (isExistBook) {
+			// nếu có rồi thì sẽ tăng số lượng
+			isExistBook.quantity += 1;
+		} else {
+			cart.push({
+				quantity: 1,
+				book: newBook,
+			});
+		}
+		// Lưu vào localStorage
+		localStorage.setItem("cart", JSON.stringify(cart));
+		setTotalCart(cart.length);
+	};
     return (
         <div className='col-md-6 col-lg-3 mt-3'>
 			<div className='card position-relative'>
@@ -107,7 +130,7 @@ const BookProps: React.FC<BookPropInterface> = ({ book }) => {
 								<Tooltip title='Thêm vào giỏ hàng'>
 									<button
 										className='btn btn-primary btn-block'
-										// onClick={() => handleAddProduct(book)}
+										onClick={() => handleAddProduct(book)}
 									>
 										<i className='fas fa-shopping-cart'></i>
 									</button>

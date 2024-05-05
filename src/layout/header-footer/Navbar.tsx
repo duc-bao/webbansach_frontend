@@ -3,12 +3,16 @@ import Category from "../../models/CategoryModel";
 import CategoryModel from "../../models/CategoryModel";
 import { getAllGenre } from "../../api/GenreAPI";
 import { Link, NavLink } from "react-router-dom";
+import { Button } from "@mui/material";
+import { useCartItem } from "../utils/CartItemContext";
 interface NavbarProps {
     keywordSearch: string;
     setKeywordSearch: (keyword: string) => void;
+    totalCart: number | undefined;
 }
 
 function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
+    const { totalCart, setTotalCart, setCartList } = useCartItem();
     const [temporary, setTemporary] = useState("");
     const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTemporary(e.target.value);
@@ -29,7 +33,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
     }, []);
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-light bg-light sticky-top">
             <div className="container-fluid">
                 <Link className="navbar-brand mt-2 mt-lg-0" to="/">
                     <img
@@ -59,7 +63,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                             <NavLink
                                 className="nav-link"
                                 aria-current="page"
-                                to = '/'
+                                to="/"
                             >
                                 Trang chủ
                             </NavLink>
@@ -90,16 +94,16 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                                 })}
                             </ul>
                         </li>
-                        <li className='nav-item'>
-							<NavLink className='nav-link' to='/about'>
-								Giới thiệu
-							</NavLink>
-						</li>
-                        <li className='nav-item'>
-							<NavLink className='nav-link' to='/search'>
-								Kho sách
-							</NavLink>
-						</li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/about">
+                                Giới thiệu
+                            </NavLink>
+                        </li>
+                        <li className="nav-item">
+                            <NavLink className="nav-link" to="/search">
+                                Kho sách
+                            </NavLink>
+                        </li>
                     </ul>
                 </div>
                 {/* Tim kiem */}
@@ -123,20 +127,23 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                 {/* Shopping Cart Icon */}
                 <ul className="navbar-nav me-1">
                     <li className="nav-item">
-                        <a className="nav-link" href="#">
+                        <Link className="nav-link" to="/cart">
                             <i className="fas fa-shopping-cart"></i>
-                        </a>
+                            <span className='badge rounded-pill badge-notification bg-danger'>
+							{totalCart ? totalCart : ""}
+						</span>
+                        </Link>
                     </li>
                 </ul>
-
-                {/* User Login Icon */}
-                <ul className="navbar-nav me-1">
-                    <li className="nav-item">
-                        <a className="nav-link" href="#">
-                            <i className="fas fa-user"></i>
-                        </a>
-                    </li>
-                </ul>
+                {/* Đăng kí đăng nhập */}
+                <div>
+                    <Link to={"/login"}>
+                        <Button>Đăng nhập</Button>
+                    </Link>
+                    <Link to={"/register"}>
+                        <Button>Đăng ký</Button>
+                    </Link>
+                </div>
             </div>
         </nav>
     );

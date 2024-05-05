@@ -3,7 +3,10 @@ import { getHotBook } from "../../api/BookAPI";
 import BookModel from "../../models/BookModel";
 import { Skeleton } from "@mui/material";
 import BookProps from "./components/BookProps";
-interface HotBookListInterface {}
+interface HotBookListInterface {
+	totalCart: any;
+	setTotalCart: any;
+}
 const HotBookList: React.FC<HotBookListInterface> = (props) => {
     const [bookList, setBookList] = useState<BookModel[]>([]);
     const [loadData, setLoadData] = useState(true);
@@ -71,7 +74,11 @@ const HotBookList: React.FC<HotBookListInterface> = (props) => {
 			<hr className='mt-0' />
 			<div className='row'>
 				{bookList.map((book) => (
-					<BookProps key={book.idBook} book={book} />
+					<BookProps
+					key={book.idBook}
+					book={book}
+					setTotalCart={props.setTotalCart}
+				/>
 				))}
 			</div>
 		</div>

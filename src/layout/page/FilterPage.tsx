@@ -8,6 +8,7 @@ import useScrollToTop from "../hooks/ScrollToTop";
 
 interface FilterPageProps {
 	keySearchNav?: string; // key search từ navbar
+	setTotalCart: any;
 }
 
 const FilterPage: React.FC<FilterPageProps> = (props) => {
@@ -61,6 +62,7 @@ const FilterPage: React.FC<FilterPageProps> = (props) => {
 				idGenre={idGenreNumber ? idGenreNumber : idGenre}
 				filter={filter}
                 keywordSearch={keySearch}
+				setTotalCart={props.setTotalCart}
 			/>
 		</>
 	);

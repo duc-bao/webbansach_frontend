@@ -13,6 +13,8 @@ interface BookListProps {
     idGenre?: number;
     filter?: number;
     keywordSearch?: string;
+    setTotalCart?: any;
+	totalCart?: number;
 }
 const DanhSachSanPham: React.FC<BookListProps> = (props) => {
     const [bookList, setBookList] = useState<BookModel[]>([]);
@@ -121,7 +123,11 @@ const DanhSachSanPham: React.FC<BookListProps> = (props) => {
 			<hr className='mt-0' />
 			<div className='row'>
 				{bookList.map((book) => (
-					<BookProps key={book.idBook} book={book} />
+					<BookProps
+                    key={book.idBook}
+                    book={book}
+                    setTotalCart={props.setTotalCart}
+                />
 				))}
 			</div>
 		</div>

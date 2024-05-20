@@ -16,6 +16,7 @@
     "@types/node": "^16.18.96",
     "@types/react": "^18.2.79",
     "@types/react-dom": "^18.2.25",
+    "jwt-decode": "^4.0.0",
     "material-ui-confirm": "^3.0.12",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

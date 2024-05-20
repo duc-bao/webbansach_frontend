@@ -22,8 +22,8 @@ import { toast } from "react-toastify";
 import CartItemModel from "../../models/CartItemModel";
 import { useCartItem } from "../utils/CartItemContext";
 interface BookDetailProps {
-	totalCart: number;
-	setTotalCart: any;
+    totalCart: number;
+    setTotalCart: any;
 }
 
 const BookDetail: React.FC<BookDetailProps> = (props) => {
@@ -126,8 +126,8 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
     const handleAddProduct = async (newBook: BookModel) => {
         // cái isExistBook này sẽ tham chiếu đến cái cart ở trên, nên khi update thì cart nó cũng update theo
         let isExistBook = cartList.find(
-			(cartItem) => cartItem.book.idBook === newBook.idBook
-		);
+            (cartItem) => cartItem.book.idBook === newBook.idBook
+        );
         // Thêm 1 sản phẩm vào giỏ hàng
         if (isExistBook) {
             // nếu có rồi thì sẽ tăng số lượng
@@ -184,11 +184,13 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
             //         console.log(error);
             //     }
             // } else {
-            //     cartList.push({
-            //         quantity: quantity,
-            //         book: newBook,
+            //
             //     });
             // }
+            cartList.push({
+                quantity: quantity,
+                book: newBook,
+            });
         }
         // Lưu vào localStorage
         localStorage.setItem("cart", JSON.stringify(cartList));
@@ -422,7 +424,9 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
                                                         <ShoppingCartOutlined />
                                                     }
                                                     className="me-3"
-                                                    onClick={() => props.setTotalCart(props.totalCart + 1)}
+                                                    onClick={() =>
+                                                        handleAddProduct(book)  
+                                                    }
                                                 >
                                                     Thêm vào giỏ hàng
                                                 </Button>

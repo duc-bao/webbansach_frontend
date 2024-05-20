@@ -10,8 +10,9 @@ interface CartItemContextInterface {
     totalCart: number;
     setTotalCart: any;
 }
+//Tạo bối cảnh giỏ hàng
 const CartItem = createContext<CartItemContextInterface | undefined>(undefined);
-
+// Truyền theo cách API mà ko cần truyền qua các cấp thủ công
 export const CartItemContext: React.FC<CartItemProps | undefined> = (props) => {
     const [cartList, setCartList] = useState<CartItemModel[]>([]);
     const [totalCart, setTotalCart] = useState(0);

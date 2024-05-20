@@ -9,12 +9,15 @@ import BookDetail from "./layout/Products/BookDetail";
 import { CartItemContext } from "./layout/utils/CartItemContext";
 import CartPage from "./layout/page/CartPage";
 import CartItemModel from "./models/CartItemModel";
+import RegisterPage from "./layout/User/Register";
+import LoginPage from "./layout/User/LoginPage";
+import ActiveCodeUser from "./layout/User/ActiveCodeUser";
 
 function App() {
     const [keywordSearch, setKeywordSearch] = useState("");
     const [cartList, setCartList] = useState<CartItemModel[]>([]);
     const [totalCart, setTotalCart] = useState(0);
-
+    // Lấy giỏ hàng từ local
     useEffect(() => {
         const cartData: string | null = localStorage.getItem("cart");
         const cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
@@ -27,8 +30,8 @@ function App() {
     }, []);
     return (
         <div className="App">
-            <BrowserRouter>
-                <CartItemContext>
+            <CartItemContext>
+                <BrowserRouter>
                     <Navbar
                         keywordSearch={keywordSearch}
                         setKeywordSearch={setKeywordSearch}
@@ -71,6 +74,14 @@ function App() {
                                 ></CartPage>
                             }
                         ></Route>
+                        <Route
+                            path="/register"
+                            element={<RegisterPage></RegisterPage>}
+                        ></Route>
+                        <Route path="/login" element={<LoginPage />}></Route>
+                        <Route 
+                            path="/active-account/:email/:activeCode"
+                            element={<ActiveCodeUser></ActiveCodeUser>}></Route>
                         {/* <Route
                         path="/my-favorite-book"
                         element={<MyFavoriteBook></MyFavoriteBook>}
@@ -79,8 +90,8 @@ function App() {
                     <Route path="/register" element={<RegisterPage />}></Route> */}
                     </Routes>
                     <Footer></Footer>
-                </CartItemContext>
-            </BrowserRouter>
+                </BrowserRouter>
+            </CartItemContext>  
         </div>
     );
 }

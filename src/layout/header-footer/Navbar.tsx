@@ -12,7 +12,7 @@ interface NavbarProps {
 }
 
 function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
-    const { totalCart, setTotalCart, setCartList } = useCartItem();
+    const { totalCart, setTotalCart, setCartList } = useCartItem(); 
     const [temporary, setTemporary] = useState("");
     const onSearchInputChange = (e: ChangeEvent<HTMLInputElement>) => {
         setTemporary(e.target.value);

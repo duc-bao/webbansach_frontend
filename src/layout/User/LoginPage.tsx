@@ -54,7 +54,7 @@ const LoginPage: React.FC = () => {
                 
                 localStorage.setItem("token", jwt);
                 if (decodedToken.role === "ADMIN") {
-                    navigation("/about");
+                    navigation("/admin");
                 } else {
                     navigation("/");
                 }

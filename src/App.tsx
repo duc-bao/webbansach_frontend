@@ -16,6 +16,8 @@ import BookManagement from "./admin/BookManagement";
 import { AuthoProvider } from "./layout/utils/AuthorizationContext";
 import { Error403Page } from "./layout/page/403Page";
 import { Error404Page } from "./layout/page/404Page";
+import DashBoardPage from "./admin/DashBoard";
+import GenreManagementPage from "./admin/GenreManagement";
 
 
 const MyRoutes = () => {
@@ -107,6 +109,8 @@ const MyRoutes = () => {
                             >
                                 {" "}
                             </Route>
+                            <Route path="/admin/genre" element = {<GenreManagementPage></GenreManagementPage>}></Route>
+                            <Route  path="/admin" element={<DashBoardPage></DashBoardPage>}></Route>
                         </Routes>
                     </div>
                 </div>

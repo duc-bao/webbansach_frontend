@@ -1,4 +1,5 @@
 import { jwtDecode } from "jwt-decode"
+import { JwtPayLoad } from "../../admin/RequireAdmin";
 
 export const isTokenExpired = (token :string)=>{
     const decodedToken  = jwtDecode(token);
@@ -15,3 +16,45 @@ export const isToken = () =>{
     }
     return false;
 }
+export function getAvatarByToken() {
+    const token = localStorage.getItem("token");
+    if(token) {
+        const decodedToken = jwtDecode(token) as JwtPayLoad;
+        return decodedToken.avatar;
+    }
+}
+export function getLastNameByToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+       const decodedToken = jwtDecode(token) as JwtPayLoad;
+       return decodedToken.lastname;
+    }
+ }
+ 
+ export function getUsernameByToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+       return jwtDecode(token).sub;
+    }
+ }
+ 
+ export function getIdUserByToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+       const decodedToken = jwtDecode(token) as JwtPayLoad;
+       return decodedToken.id;
+    }
+ }
+ 
+ export function getRoleByToken() {
+    const token = localStorage.getItem('token');
+    if (token) {
+       const decodedToken = jwtDecode(token) as JwtPayLoad;
+       return decodedToken.role;
+    }
+ }
+ export function logout(navigate:any){
+    navigate("/login");
+    localStorage.removeItem("token");
+    localStorage.removeItem("cart");
+ }

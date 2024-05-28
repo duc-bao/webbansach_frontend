@@ -22,3 +22,7 @@ export async function getGenreByIdBook(idBook:number):Promise<resultInterface>{
     const url = `http://localhost:8080/books/${idBook}/categoryList`;
     return getGenre(url);
 }
+export async function getGenreByID(id : number) {
+    const url = `http://localhost:8080/categories/${id}`
+    return getGenre(url);
+}

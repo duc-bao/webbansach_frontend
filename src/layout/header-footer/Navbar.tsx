@@ -178,7 +178,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                                 href="#"
                                 id="navbarDropdownMenuLink"
                                 role="button"
-                                data-mdb-toggle="dropdown"
+                                data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
                                 <i className="fas fa-bell"></i>
@@ -214,7 +214,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                                 href="#"
                                 id="navbarDropdownMenuAvatar"
                                 role="button"
-                                data-mdb-toggle="dropdown"
+                                data-bs-toggle="dropdown"
                                 aria-expanded="false"
                             >
                                 <Avatar

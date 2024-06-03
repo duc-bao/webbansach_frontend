@@ -1,47 +1,41 @@
+import UserModel from "./UserModel"
+
 class OrderModel{
     idOrder: number
     dateOrder: Date
-    purchaseAddress: string
+    purchaseAddress?: string
     deliveryAddress: string
     totalPriceProduct: number
     feePayment: number
     status: string
-    note: string
-    phoneNumber: string
-    fullName: string
+    note?: string
+    phoneNumber?: string
+    fullName?: string
     feeDelivery: number
     totalPrice: number
-    statusPayment: string
-    statusDelivery: string
+    statusPayment?: string
+    statusDelivery?: string
+    user ?: UserModel
     constructor(idOrder: number,
-        dateOrder: Date,
-        purchaseAddress: string,
         deliveryAddress: string,
-        totalPriceProduct: number,
-        feePayment: number,
-        status: string,
-        note: string,
-        phoneNumber: string,
-        fullName: string,
-        feeDelivery: number,
         totalPrice: number,
-        statusPayment: string,
-        statusDelivery: string){
-            this.idOrder = idOrder
-            this.dateOrder = dateOrder
-            this.purchaseAddress = purchaseAddress
-            this.deliveryAddress = deliveryAddress
-            this.totalPriceProduct = totalPriceProduct
-            this.feePayment = feePayment
-            this.status = status
-            this.note = note
-            this.phoneNumber = phoneNumber
-            this.fullName = fullName
-            this.feeDelivery = feeDelivery
-            this.totalPrice = totalPrice
-            this.statusPayment = statusPayment
-            this.statusDelivery = statusDelivery
-    }
+        totalPriceProduct: number,
+        feeDelivery: number,
+        feePayment: number,
+        dateOrder: Date,
+        user: UserModel,
+        status: string,) {
+        this.idOrder = idOrder;
+        this.deliveryAddress = deliveryAddress;
+        this.totalPrice = totalPrice;
+        this.dateOrder = dateOrder;
+        this.status = status;
+        this.feeDelivery = feeDelivery;
+        this.feePayment = feePayment;
+        this.totalPriceProduct = totalPriceProduct;
+        this.user = user;
+     }
+    
 
 }
 export default OrderModel;

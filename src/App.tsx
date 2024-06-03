@@ -18,7 +18,9 @@ import { Error403Page } from "./layout/page/403Page";
 import { Error404Page } from "./layout/page/404Page";
 import DashBoardPage from "./admin/DashBoard";
 import GenreManagementPage from "./admin/GenreManagement";
-
+import OrderManagementPage from "./admin/OrderManagement";
+import UserManagementPage from "./admin/UserManagement";
+import { SlideBar } from "./admin/component/SideBar";
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -40,83 +42,118 @@ const MyRoutes = () => {
     const isAdmin = location.pathname.startsWith("/admin");
     return (
         <AuthoProvider>
-        <CartItemContext>
-            {!isAdmin && (
-                <Navbar
-                    keywordSearch={keywordSearch}
-                    setKeywordSearch={setKeywordSearch}
-                    totalCart={totalCart}
-                ></Navbar>
-            )}
-            <Routes>
-                <Route
-                    path="/"
-                    element={
-                        <HomePage
-                            keywordSearch={keywordSearch}
-                            setTotalCart={setTotalCart}
-                            totalCart={totalCart}
-                        ></HomePage>
-                    }
-                />
-                <Route
-                    path="/search/:idGenreParam"
-                    element={<FilterPage setTotalCart={setTotalCart} />}
-                />
-                <Route
-                    path="/search"
-                    element={<FilterPage setTotalCart={setTotalCart} />}
-                />
-                <Route path="/about" element={<About></About>} />
-                <Route
-                    path="/book/:idBook"
-                    element={
-                        <BookDetail
-                            setTotalCart={setTotalCart}
-                            totalCart={totalCart}
-                        ></BookDetail>
-                    }
-                />
-                <Route
-                    path="/cart"
-                    element={<CartPage setTotalCart={setTotalCart}></CartPage>}
-                ></Route>
-                <Route
-                    path="/register"
-                    element={<RegisterPage></RegisterPage>}
-                ></Route>
-                <Route path="/login" element={<LoginPage />}></Route>
-                <Route
-                    path="/active-account/:email/:activeCode"
-                    element={<ActiveCodeUser></ActiveCodeUser>}
-                ></Route>
-                <Route path="error-403" element={<Error403Page></Error403Page>}></Route>
-                <Route path="error-404" element={<Error404Page></Error404Page>}></Route>
-                {/* <Route
+            <CartItemContext>
+                {!isAdmin && (
+                    <Navbar
+                        keywordSearch={keywordSearch}
+                        setKeywordSearch={setKeywordSearch}
+                        totalCart={totalCart}
+                    ></Navbar>
+                )}
+                <Routes>
+                    <Route
+                        path="/"
+                        element={
+                            <HomePage
+                                keywordSearch={keywordSearch}
+                                setTotalCart={setTotalCart}
+                                totalCart={totalCart}
+                            ></HomePage>
+                        }
+                    />
+                    <Route
+                        path="/search/:idGenreParam"
+                        element={<FilterPage setTotalCart={setTotalCart} />}
+                    />
+                    <Route
+                        path="/search"
+                        element={<FilterPage setTotalCart={setTotalCart} />}
+                    />
+                    <Route path="/about" element={<About></About>} />
+                    <Route
+                        path="/book/:idBook"
+                        element={
+                            <BookDetail
+                                setTotalCart={setTotalCart}
+                                totalCart={totalCart}
+                            ></BookDetail>
+                        }
+                    />
+                    <Route
+                        path="/cart"
+                        element={
+                            <CartPage setTotalCart={setTotalCart}></CartPage>
+                        }
+                    ></Route>
+                    <Route
+                        path="/register"
+                        element={<RegisterPage></RegisterPage>}
+                    ></Route>
+                    <Route path="/login" element={<LoginPage />}></Route>
+                    <Route
+                        path="/active-account/:email/:activeCode"
+                        element={<ActiveCodeUser></ActiveCodeUser>}
+                    ></Route>
+                    <Route
+                        path="error-403"
+                        element={<Error403Page></Error403Page>}
+                    ></Route>
+                    <Route
+                        path="error-404"
+                        element={<Error404Page></Error404Page>}
+                    ></Route>
+                    {/* <Route
                         path="/my-favorite-book"
                         element={<MyFavoriteBook></MyFavoriteBook>}
                     ></Route>
                    
                     <Route path="/register" element={<RegisterPage />}></Route> */}
-            </Routes>
-            {isAdmin && (
-                <div className="row overflow-hidden w-100">
-                    <div className="col-12">
-                        <Routes>
-                            <Route
-                                path="/admin/book"
-                                element={<BookManagement></BookManagement>}
-                            >
-                                {" "}
-                            </Route>
-                            <Route path="/admin/genre" element = {<GenreManagementPage></GenreManagementPage>}></Route>
-                            <Route  path="/admin" element={<DashBoardPage></DashBoardPage>}></Route>
-                        </Routes>
+                </Routes>
+                {isAdmin && (
+                    <div className="row overflow-hidden w-100">
+                        <div className="col-2 col-md-3 col-lg-2">
+                            <SlideBar></SlideBar>
+                        </div>
+                        <div className="col-10 col-md-9 col-lg-10">
+                            <Routes>
+                                <Route
+                                    path="/admin/book"
+                                    element={<BookManagement></BookManagement>}
+                                >
+                                    {" "}
+                                </Route>
+                                <Route
+                                    path="/admin/genre"
+                                    element={
+                                        <GenreManagementPage></GenreManagementPage>
+                                    }
+                                ></Route>
+                                <Route
+										path='/admin/dashboard'
+										element={<DashBoardPage />}
+									/>
+                                <Route
+                                    path="/admin"
+                                    element={<DashBoardPage></DashBoardPage>}
+                                ></Route>
+                                <Route
+                                    path="/admin/order"
+                                    element={
+                                        <OrderManagementPage></OrderManagementPage>
+                                    }
+                                ></Route>
+                                <Route
+                                    path="/admin/user"
+                                    element={
+                                        <UserManagementPage></UserManagementPage>
+                                    }
+                                ></Route>
+                            </Routes>
+                        </div>
                     </div>
-                </div>
-            )}
-            {!isAdmin && <Footer></Footer>}
-        </CartItemContext>
+                )}
+                {!isAdmin && <Footer></Footer>}
+            </CartItemContext>
         </AuthoProvider>
     );
 };

@@ -110,6 +110,11 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                                 })}
                             </ul>
                         </li>
+                        <li className='nav-item'>
+							<Link className='nav-link' to={"/policy"}>
+								Chính sách
+							</Link>
+						</li>
                         <li className="nav-item">
                             <NavLink className="nav-link" to="/about">
                                 Giới thiệu
@@ -130,7 +135,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                     </ul>
                 </div>
                 {/* Tim kiem */}
-                <div className="d-flex" role="search">
+                {/* <div className="d-flex" role="search">
                     <input
                         className="form-control me-2"
                         type="search"
@@ -146,7 +151,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                     >
                         Search
                     </button>
-                </div>
+                </div> */}
                 {/* Shopping Cart Icon */}
                 <ul className="navbar-nav me-1">
                     <li className="nav-item">

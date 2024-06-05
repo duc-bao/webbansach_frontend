@@ -24,6 +24,7 @@ import { SlideBar } from "./admin/component/SideBar";
 import { ConfirmProvider } from "material-ui-confirm";
 import { ForgotPassword } from "./layout/User/FogotPassword";
 import { ProfilePage } from "./layout/User/ProfilePage";
+import PolicyPage from "./layout/page/PolicyPage";
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -69,6 +70,7 @@ const MyRoutes = () => {
 							path='/profile'
 							element={<ProfilePage setReloadAvatar={setReloadAvatar} />}
 						/>
+                    <Route path="/policy" element= {<PolicyPage></PolicyPage>}></Route>
                     <Route path="/forgot-password" element={<ForgotPassword></ForgotPassword>}></Route>
                     <Route
                         path="/search/:idGenreParam"

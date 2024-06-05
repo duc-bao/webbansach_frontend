@@ -9,6 +9,7 @@ interface OrderManagementProps{}
 const OrderManagement : React.FC = () =>{
     const [keyCountReload, setKeyCountReload] = useState(0);
     const [option, setOption] = useState("");
+    const [id, setId] = useState(0);
     const [openModal, setOpenModal] = useState(false);
 	const handleOpenModal = () => setOpenModal(true);
 	const handleCloseModal = () => setOpenModal(false);
@@ -21,6 +22,8 @@ const OrderManagement : React.FC = () =>{
                         setOption = {setOption}
                         handleOpenModal = {handleOpenModal}
                         setKeyCountReload = {setKeyCountReload}
+                        setId={setId}
+
                     ></OrderTable>
                 </div>
             </div>
@@ -29,7 +32,10 @@ const OrderManagement : React.FC = () =>{
                 handleOpen={handleOpenModal}
                 handleClose={handleCloseModal}
             >
-                <OrderForm option = {option} setKeyCountReload = {setKeyCountReload}></OrderForm>  
+                <OrderForm id={id}
+					option={option}
+					setKeyCountReload={setKeyCountReload}
+					handleCloseModal={handleCloseModal}></OrderForm>  
             </FadeModal>
         </div>
     )

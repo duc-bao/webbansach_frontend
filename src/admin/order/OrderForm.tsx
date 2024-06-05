@@ -3,8 +3,10 @@ import OrderModel from "../../models/OrderModel";
 import { Box, TextField, Typography } from "@mui/material";
 
 interface OrderFormProps {
-	option: string;
+	id: any;
+	option?: string;
 	setKeyCountReload?: any;
+	handleCloseModal?: any;
 }
 
 export const OrderForm: React.FC<OrderFormProps> = (props) => {

@@ -16,6 +16,7 @@ class OrderModel{
     statusPayment?: string
     statusDelivery?: string
     user ?: UserModel
+    payment?: string;
     constructor(idOrder: number,
         deliveryAddress: string,
         totalPrice: number,

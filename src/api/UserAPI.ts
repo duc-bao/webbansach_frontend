@@ -1,5 +1,6 @@
 import UserModel from "../models/UserModel";
 import { my_request, requestAdmin } from "./Request";
+import { getRoleByIdUser } from "./RoleAPI";
 
 
 async function getUser(url:string):Promise<UserModel>{
@@ -37,4 +38,26 @@ export async function getAllUser() : Promise<UserModel[]> {
      });
   
      return data;
+}
+
+export async function get1User(idUser : any): Promise<UserModel> {
+
+    const url = `http://localhost:8080/users/${idUser}`
+    const response = await my_request(url);
+    const responseRole = await getRoleByIdUser(idUser);
+    const user: UserModel = {
+        idUser: response.idUser,
+        avatar: response.avatar,
+        dateOfBirth: response.dateOfBirth,
+        deliveryAdress: response.deliveryAddress,
+        email: response.email,
+        firstName: response.firstName,
+        lastName: response.lastName,
+        gender: response.gender,
+        phoneNumber: response.phoneNumber,
+        userName: response.username,
+        role: responseRole.idRole,
+     };
+     return user;
+
 }

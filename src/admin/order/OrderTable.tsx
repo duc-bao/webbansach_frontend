@@ -12,6 +12,7 @@ interface OrderTableProps {
     setOption: any
     handleOpenModal : any
     setKeyCountReload?: any
+	setId: any;
 }
 
 export  const OrderTable : React.FC<OrderTableProps> = (props) =>{

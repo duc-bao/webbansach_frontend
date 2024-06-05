@@ -1,3 +1,5 @@
+import CategoryModel from "./CategoryModel";
+
 class BookModel {
     idBook: number;
     nameBook?: string; //CO the null
@@ -11,6 +13,9 @@ class BookModel {
     soldQuantity?: number;
     thumbnail?: string;
     discountPercent?: number;
+    relatedImg?: string[];
+    idGenres?: number[];
+    genresList?: CategoryModel[];
     constructor(
         idBook: number,
         nameBook: string, //CO the null
@@ -23,7 +28,8 @@ class BookModel {
         avgRating: number,
         soldQuantity: number,
         thumbnail: string,
-        discountPercent: number
+        discountPercent: number,
+        genresList: CategoryModel[]
     ) {
         this.idBook = idBook;
         this.nameBook = nameBook;
@@ -37,6 +43,7 @@ class BookModel {
         this.soldQuantity = soldQuantity;
         this.discountPercent = discountPercent;
         this.thumbnail = thumbnail;
+        
     }
 }
 export default BookModel;

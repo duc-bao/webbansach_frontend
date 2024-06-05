@@ -1,14 +1,20 @@
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import BookModel from "../../models/BookModel";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { CloudUpload } from "@mui/icons-material";
 import { isToastActive } from "react-toastify/dist/core/store";
 import { toast } from "react-toastify";
 import { error } from "console";
-
+import CategoryModel from "../../models/CategoryModel";
+import { getBookByIdAllInformation } from "../../api/BookAPI";
+import { getAllGenre } from "../../api/GenreAPI";
+import { LoadingButton } from "@mui/lab";
+import { SelectMultiple } from "../../layout/utils/SelectMuiltiple";
 interface BookFormProps {
     option: any;
     setKeyCountReload?: any;
+    id: number;
+    handleCloseModal: any;
 }
 
 export const BookForm: React.FC<BookFormProps> = (props) => {
@@ -24,15 +30,72 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
         soldQuantity: NaN,
         discountPercent: NaN,
         thumbnail: "",
+        relatedImg: [],
+        idGenres: [],
     });
+
     const [thumbnail, setThumbnail] = useState<File | null>(null);
     const [previewthumbnail, setPreviewthumbnail] = useState("");
+    const [genresList, setGenresList] = useState<CategoryModel[]>([]);
+    const [genresListSelected, setGenresListSelected] = useState<number[]>([]);
+    const [previewRelatedImages, setPreviewRelatedImages] = useState<string[]>(
+        []
+    );
+    // Giá trị khi đã chọn ở trong select multiple
+    const [SelectedListName, setSelectedListName] = useState<any[]>([]);
+    // Khi submit thì btn loading ...
+    const [statusBtn, setStatusBtn] = useState(false);
+    // Biến reload (cho selectMultiple)
+    const [reloadCount, setReloadCount] = useState(0);
+    // Lấy dữ liệu khi update
+    useEffect(() => {
+        if (props.option === "update") {
+            getBookByIdAllInformation(props.id).then((response) => {
+                setBook(response as BookModel);
+                setPreviewthumbnail(response?.thumbnail as string);
+                setPreviewRelatedImages(response?.relatedImg as string[]);
+                response?.genresList?.forEach((data) => {
+                    setSelectedListName((prev) => [...prev, data.nameCategory]);
+                    setBook((prevBook) => {
+                        return {
+                            ...prevBook,
+                            idGenres: [
+                                ...(prevBook.idGenres || []),
+                                data.idCategory,
+                            ],
+                        };
+                    });
+                });
+            });
+        }
+    }, [props.option, props.id]);
+    // Khúc này lấy ra tất cả thể loại để cho vào select
+    useEffect(() => {
+        getAllGenre().then((response) => {
+            setGenresList(response.genreList);
+        });
+    }, [props.option]);
+    // Khúc này để lưu danh sách thể loại của sách
+    useEffect(() => {
+        setBook({ ...book, idGenres: genresListSelected });
+    }, [genresListSelected]);
     const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const token = localStorage.getItem("token");
 
-        fetch("http://localhost:8080/book/add-book", {
-            method: "POST",
+        const token = localStorage.getItem("token");
+        let bookRequest: BookModel = book;
+        if (bookRequest.discountPercent === 0) {
+            setStatusBtn(true);
+            bookRequest = { ...book, sellPrice: book.listPrice };
+        }
+        setStatusBtn(true);
+        const endpoint =
+            props.option === "add"
+                ? `http://localhost:8080/book/add-book`
+                : `http://localhost:8080/book/update-book`;
+        const method = props.option === "add" ? "POST" : "PUT";
+        fetch(endpoint, {
+            method: method,
             headers: {
                 Authorization: `Bearer ${token}`,
                 "content-type": "application/json",
@@ -53,12 +116,22 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
                         soldQuantity: NaN,
                         discountPercent: NaN,
                         thumbnail: "",
+                        relatedImg: [],
+                        idGenres: [],
                     });
                     setThumbnail(null);
                     setPreviewthumbnail("");
-                    toast.success("Thêm sách thành công");
+                    setPreviewRelatedImages([]);
+                    setReloadCount(Math.random());
+                    setStatusBtn(false);
+                    props.setKeyCountReload(Math.random());
+                    props.handleCloseModal();
+                    props.option === "add"
+                        ? toast.success("Thêm sách thành công")
+                        : toast.success("Cập nhật sách thành công");
                 } else {
                     toast.error("Gặp lỗi trong quá trình xử lí sách");
+                    setStatusBtn(false);
                 }
             })
             .catch((error) => {
@@ -82,6 +155,47 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
             reader.readAsDataURL(selectedFile);
         }
     };
+    function handleThumImageUpload(event: React.ChangeEvent<HTMLInputElement>) {
+        const inputElement = event.target as HTMLInputElement;
+
+        if (inputElement.files && inputElement.files.length > 0) {
+            const newPreviewImages = [...previewRelatedImages];
+
+            if (newPreviewImages.length + inputElement.files.length > 5) {
+                toast.warning("Chỉ được tải lên tối đa 5 ảnh");
+                return;
+            }
+
+            // Duyệt qua từng file đã chọn
+            for (let i = 0; i < inputElement.files.length; i++) {
+                const selectedFile = inputElement.files[i];
+
+                const reader = new FileReader();
+
+                // Xử lý sự kiện khi tệp đã được đọc thành công
+                reader.onload = (e: any) => {
+                    // e.target.result chính là chuỗi base64
+                    const thumbnailBase64 = e.target?.result as string;
+
+                    setBook((prevBook) => ({
+                        ...prevBook,
+                        relatedImg: [
+                            ...(prevBook.relatedImg || []),
+                            thumbnailBase64,
+                        ],
+                    }));
+
+                    newPreviewImages.push(URL.createObjectURL(selectedFile));
+
+                    // Cập nhật trạng thái với mảng mới
+                    setPreviewRelatedImages(newPreviewImages);
+                };
+
+                // Đọc tệp dưới dạng chuỗi base64
+                reader.readAsDataURL(selectedFile);
+            }
+        }
+    }
     return (
         <div>
             <Typography className="text-center" variant="h4" component="h2">
@@ -162,7 +276,11 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
                                 />
                             </Box>
                         </div>
-                        <div className="col-6">
+                        <div
+                            className={
+                                props.option === "update" ? "col-4" : "col-6"
+                            }
+                        >
                             <Box
                                 sx={{
                                     "& .MuiTextField-root": { mb: 3 },
@@ -187,7 +305,16 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
                                     }
                                     size="small"
                                 />
-
+                                <SelectMultiple
+                                    selectedList={genresListSelected}
+                                    setSelectedList={setGenresListSelected}
+                                    selectedListName={SelectedListName}
+                                    setSelectedListName={setSelectedListName}
+                                    values={genresList}
+                                    setValue={setBook}
+                                    key={reloadCount}
+                                    required={true}
+                                />
                                 <TextField
                                     id="filled-required"
                                     label="Giảm giá (%)"
@@ -198,18 +325,61 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
                                             ? ""
                                             : book.discountPercent
                                     }
-                                    onChange={(e) =>
-                                        setBook({
-                                            ...book,
-                                            discountPercent: parseInt(
-                                                e.target.value
-                                            ),
-                                        })
-                                    }
+                                    onChange={(e: any) => {
+										setBook({
+											...book,
+											discountPercent: parseInt(e.target.value),
+											sellPrice:
+                                            (book.listPrice ?? 0) - Math.round(((book.listPrice ?? 0) * Number.parseInt(e.target.value)) / 100),
+										});
+									}}
                                     size="small"
                                 />
                             </Box>
                         </div>
+                        {props.option === "update" && (
+							<div className='col-4'>
+								<Box
+									sx={{
+										"& .MuiTextField-root": { mb: 3 },
+									}}
+								>
+									<TextField
+										id='filled-required'
+										label='Giá bán'
+										style={{ width: "100%" }}
+										value={(book.sellPrice ?? 0).toLocaleString("vi-VN")}
+										type='number'
+										InputProps={{
+											disabled: true,
+										}}
+										size='small'
+									/>
+
+									<TextField
+										id='filled-required'
+										label='Đã bán'
+										style={{ width: "100%" }}
+										value={book.soldQuantity}
+										InputProps={{
+											disabled: true,
+										}}
+										size='small'
+									/>
+
+									<TextField
+										id='filled-required'
+										label='Điểm đánh giá'
+										style={{ width: "100%" }}
+										value={book.avgRating}
+										InputProps={{
+											disabled: true,
+										}}
+										size='small'
+									/>
+								</Box>
+							</div>
+						)}
                         <div className="col-12">
                             <Box
                                 sx={{
@@ -251,15 +421,51 @@ export const BookForm: React.FC<BookFormProps> = (props) => {
                             <span className="ms-3">{thumbnail?.name}</span>
                             <img src={previewthumbnail} alt="" width={100} />
                         </div>
+                        <div className='d-flex align-items-center mt-3'>
+							<Button
+								size='small'
+								component='label'
+								variant='outlined'
+								startIcon={<CloudUpload />}
+							>
+								Tải ảnh liên quan
+								<input
+									style={{ opacity: "0", width: "10px" }}
+									// required
+									type='file'
+									accept='image/*'
+									onChange={handleThumImageUpload}
+									multiple
+									alt=''
+								/>
+							</Button>
+							{previewRelatedImages.map((imgURL) => (
+								<img src={imgURL} alt='' width={100} />
+							))}
+							{previewRelatedImages.length > 0 && (
+								<Button
+									onClick={() => {
+										setPreviewRelatedImages([]);
+										setBook({ ...book, relatedImg: [] });
+									}}
+								>
+									Xoá tất cả
+								</Button>
+							)}
+						</div>
                     </div>
                     {props.option !== "view" && (
-                        <button
-                            className="btn btn-primary w-100 my-3"
-                            type="submit"
-                        >
-                            {props.option === "add" ? "Tạo sách" : "Lưu sách"}
-                        </button>
-                    )}
+						<LoadingButton
+							className='w-100 my-3'
+							type='submit'
+							loading={statusBtn}
+							variant='outlined'
+							sx={{ width: "25%", padding: "10px" }}
+						>
+							{props.option === "add" ? "Tạo sách" : "Lưu sách"}
+						</LoadingButton>
+					)}
+
                 </form>
             </div>
         </div>

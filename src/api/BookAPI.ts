@@ -2,6 +2,8 @@ import React from "react";
 import BookModel from "../models/BookModel";
 import { my_request } from "./Request";
 import { GetAllImage } from "./ImageAPI";
+import { getAllGenre, getGenreByID } from "./GenreAPI";
+import CategoryModel from "../models/CategoryModel";
 interface resultInterface {
     // Tạo ra các biến trả về
     result: BookModel[];
@@ -28,6 +30,7 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
             avgRating: responseData[key].avgRating,
             soldQuantity: responseData[key].soldQuantity,
             discountPercent: responseData[key].discountPercent,
+            author: responseData[key].author,
         });
     }
     const bookList1 = await Promise.all(
@@ -44,7 +47,7 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
     return { result: result, totalPage: totalPage, size: size };
 }
 
-export async function getAllBook(page: number = 0): Promise<resultInterface> {
+export async function getAllBook(size?: number, page?: number): Promise<resultInterface> {
     const url: string = `http://localhost:8080/books?sort=idBook,desc&size=12&page=${page}`;
     return getBook(url);
 }
@@ -116,7 +119,6 @@ export async function getHotBook(): Promise<resultInterface> {
 }
 
 export async function getBookId(idBook: number): Promise<BookModel | null> {
-    
     let bookResponse: BookModel = {
         idBook: 0,
         nameBook: "",
@@ -150,5 +152,70 @@ export async function getBookId(idBook: number): Promise<BookModel | null> {
     } catch (error) {
         console.error("Error: ", error);
         return null;
+    }
+}
+
+export async function getBookByIdAllInformation(
+    idBook: number
+): Promise<BookModel | null> {
+    let bookResponse: BookModel = {
+        idBook: 0,
+        nameBook: "",
+        author: "",
+        description: "",
+        listPrice: NaN,
+        sellPrice: NaN,
+        quantity: NaN,
+        avgRating: NaN,
+        soldQuantity: NaN,
+        discountPercent: NaN,
+        thumbnail: "",
+        relatedImg: [],
+        idGenres: [],
+        genresList: [],
+    };
+    try{
+        const response = await getBookId(idBook);
+        if(response){
+            bookResponse = response;
+            const imageList = await GetAllImage(response.idBook);
+            const thumbnail = imageList.find((image) =>image.icon);
+            const relatedImg =imageList.map((image) =>{
+                return !image.icon ? image.linkImg || image.dataImg : null
+            }).filter(Boolean);
+            bookResponse = { ...bookResponse, relatedImg: relatedImg as string[], thumbnail: thumbnail?.linkImg || thumbnail?.dataImg };
+            // Lấy tất cả các thể loại
+            const genresList = await getGenreByID(response.idBook);
+            genresList.genreList.forEach((genre) =>{
+                const dataGenre : CategoryModel = {idCategory: genre.idCategory, nameCategory: genre.nameCategory}
+                bookResponse = {...bookResponse, genresList:[...bookResponse.genresList || [], dataGenre]};
+            })
+            return bookResponse;
+        }else {
+            throw new Error("Sách không tồn tại");
+         }
+    }catch (error) {
+        console.error('Error: ', error);
+        return null;
+     }
+}
+
+export async function getBookByIdCartItem(idCart: number): Promise<BookModel | null> {
+    const endpoint: string = `http://localhost:8080/cart-items/${idCart}/book`;
+    try {
+         // Gọi phương thức request()
+      const response = await my_request(endpoint);
+
+      // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
+      if (response) {
+
+         // Trả về quyển sách
+         return response;
+      } else {
+         throw new Error("Sách không tồn tại");
+      }
+    }catch (error) {
+        console.log('Error: ', error);
+        return null;    
     }
 }

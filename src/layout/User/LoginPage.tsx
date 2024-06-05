@@ -7,12 +7,16 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../utils/AuthorizationContext";
 import { JwtPayLoad } from "../../admin/RequireAdmin";
 import { toast } from "react-toastify";
+import CartItemModel from "../../models/CartItemModel";
+import { getCartAllByIdUser } from "../../api/CartAPI";
+import { useCartItem } from "../utils/CartItemContext";
 
 const LoginPage: React.FC = () => {
     const [username, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigation = useNavigate();
+    const { setTotalCart, setCartList } = useCartItem();
     const { isLoggedIn, setIsLoggedIn } = useAuth();
     useEffect(() => {
         if (isLoggedIn) {
@@ -36,6 +40,7 @@ const LoginPage: React.FC = () => {
             .then((response) => {
                 if (response.ok) {
                     return response.json();
+                    
                 } else {
                     throw new Error("Đăng nhập thất bại");
                 }
@@ -53,6 +58,51 @@ const LoginPage: React.FC = () => {
                 toast.success("Đăng nhập thành công");
                 
                 localStorage.setItem("token", jwt);
+                const cartData: string | null = localStorage.getItem("cart");
+				let cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
+                // Khi đăng nhập thành công mà trước đó đã thêm sản phẩm vào giỏ hàng thì các sản phẩm đó sẽ được thêm vào db
+                if (cart.length !== 0) {
+					cart = cart.map((c) => ({ ...c, idUser: decodedToken.id }));
+
+					const endpoint =   "localhost:8080/cart-item/add-cart";
+					fetch(endpoint, {
+						method: "POST",
+						headers: {
+							Authorization: `Bearer ${jwt}`,
+							"content-type": "application/json",
+						},
+						body: JSON.stringify(cart),
+					})
+						.then((response) => {
+							// Lấy giỏ hàng của user khi đăng nhâp thành công
+							async function getCart() {
+								const response = await getCartAllByIdUser();
+								// Xoá cart mà lúc chưa đăng nhập
+								localStorage.removeItem("cart");
+								cart = response;
+								// Thêm cart lúc đăng nhập
+								localStorage.setItem("cart", JSON.stringify(cart));
+								setTotalCart(cart.length);
+								setCartList(cart);
+							}
+							getCart();
+						})
+						.catch((err) => {
+							console.log(err);
+						});
+				} else {
+					// Lấy giỏ hàng của user khi đăng nhâp thành công
+					const response = await getCartAllByIdUser();
+					// Xoá cart mà lúc chưa đăng nhập
+					localStorage.removeItem("cart");
+					cart = response;
+					// Thêm cart lúc đăng nhập
+					localStorage.setItem("cart", JSON.stringify(cart));
+					setTotalCart(cart.length);
+					setCartList(cart);
+				}
+
+
                 if (decodedToken.role === "ADMIN") {
                     navigation("/admin");
                 } else {
@@ -118,6 +168,9 @@ const LoginPage: React.FC = () => {
                 </div>
                 {error && <div style={{ color: "red" }}>{error}</div>}
             </form>
+            <div className='d-flex justify-content-end mt-2 px-3'>
+				<Link to={"/forgot-password"}>Quên mật khẩu</Link>
+			</div>
         </div>
     );
 };

@@ -14,24 +14,27 @@ export async function getUserByIdReview(idReview:number) {
 export async function getAllUser() : Promise<UserModel[]> {
     const url = `http://localhost:8080/roles`
     const response =   await requestAdmin(url);
-    const data  = response._embedded.roles.map((role:any) =>{
-        const users =  role._embedded.users.map((userData:any) =>{
-            const user : UserModel = {
-                idUser: userData.idUser,
-                avatar: userData.avatar,
-                dateOfBirth: userData.dateOfBirth,
-                deliveryAdress: userData.deliveryAddress,
-                email: userData.email,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                gender: userData.gender,
-                phoneNumber: userData.phoneNumber,
-                userName: userData.username,
-                role: role.nameRole,
-             };
-             return user;
-        })
+    const data = response._embedded.roles.map((roleData: any) => {
+        // Duyệt qua mảng listUsers trong mỗi vai trò (role)
+        const users = roleData._embedded.listUsers.map( async(userData: any) => {
+           // Xử lý các trường dữ liệu trong userData tại đây
+           const user: UserModel = {
+              idUser: userData.idUser,
+              avatar: userData.avatar,
+              dateOfBirth: userData.dateOfBirth,
+              deliveryAdress: userData.deliveryAddress,
+              email: userData.email,
+              firstName: userData.firstName,
+              lastName: userData.lastName,
+              gender: userData.gender,
+              phoneNumber: userData.phoneNumber,
+              userName: userData.username,
+              role: roleData.nameRole,
+           };
+           return user;
+        });
         return users;
-    })
-    return data;
+     });
+  
+     return data;
 }

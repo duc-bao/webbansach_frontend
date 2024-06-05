@@ -23,6 +23,6 @@ export async function getGenreByIdBook(idBook:number):Promise<resultInterface>{
     return getGenre(url);
 }
 export async function getGenreByID(id : number) {
-    const url = `http://localhost:8080/categories/${id}`
+    const url = `http://localhost:8080/books/${id}/categoryList`
     return getGenre(url);
 }

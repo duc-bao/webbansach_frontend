@@ -20,7 +20,6 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
         getAllUser()
             .then((response) => {
                 const users = response
-                    .flat()
                     .map((user) => ({ ...user, id: user.idUser }));
 
                 setData(users);

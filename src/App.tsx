@@ -21,6 +21,8 @@ import GenreManagementPage from "./admin/GenreManagement";
 import OrderManagementPage from "./admin/OrderManagement";
 import UserManagementPage from "./admin/UserManagement";
 import { SlideBar } from "./admin/component/SideBar";
+import { ConfirmProvider } from "material-ui-confirm";
+import { ForgotPassword } from "./layout/User/FogotPassword";
 
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
@@ -43,6 +45,7 @@ const MyRoutes = () => {
     return (
         <AuthoProvider>
             <CartItemContext>
+                <ConfirmProvider>
                 {!isAdmin && (
                     <Navbar
                         keywordSearch={keywordSearch}
@@ -61,6 +64,7 @@ const MyRoutes = () => {
                             ></HomePage>
                         }
                     />
+                    <Route path="/forgot-password" element={<ForgotPassword></ForgotPassword>}></Route>
                     <Route
                         path="/search/:idGenreParam"
                         element={<FilterPage setTotalCart={setTotalCart} />}
@@ -153,6 +157,7 @@ const MyRoutes = () => {
                     </div>
                 )}
                 {!isAdmin && <Footer></Footer>}
+                </ConfirmProvider>
             </CartItemContext>
         </AuthoProvider>
     );

@@ -12,32 +12,54 @@ export async function getUserByIdReview(idReview:number) {
     const url:string = `http://localhost:8080/reviews/${idReview}/user`;
     return getUser(url);
 }
-export async function getAllUser() : Promise<UserModel[]> {
-    const url = `http://localhost:8080/roles`
-    const response =   await requestAdmin(url);
-    const data = response._embedded.roles.map((roleData: any) => {
-        // Duyệt qua mảng listUsers trong mỗi vai trò (role)
-        const users = roleData._embedded.listUsers.map( async(userData: any) => {
-           // Xử lý các trường dữ liệu trong userData tại đây
-           const user: UserModel = {
-              idUser: userData.idUser,
-              avatar: userData.avatar,
-              dateOfBirth: userData.dateOfBirth,
-              deliveryAdress: userData.deliveryAddress,
-              email: userData.email,
-              firstName: userData.firstName,
-              lastName: userData.lastName,
-              gender: userData.gender,
-              phoneNumber: userData.phoneNumber,
-              userName: userData.username,
-              role: roleData.nameRole,
-           };
-           return user;
-        });
-        return users;
-     });
-  
-     return data;
+// Hàm lấy danh sách user của từng role
+async function getUsersByRole(userListUrl: string, roleName: number): Promise<UserModel[]> {
+    const response = await requestAdmin(userListUrl);
+
+    if (!response || !response._embedded || !response._embedded.users) {
+        return [];
+    }
+
+    const users = response._embedded.users.map((userData: any) => {
+        const user: UserModel = {
+            idUser: userData.idUser,
+            avatar: userData.avatar,
+            dateOfBirth: userData.dateOfBirth,
+            deliveryAdress: userData.deliveryAddress,
+            email: userData.email,
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            gender: userData.gender,
+            phoneNumber: userData.phoneNumber,
+            userName: userData.username,
+            role: roleName, 
+        };
+        return user;
+    });
+
+    return users;
+}
+
+export async function getAllUser(): Promise<UserModel[]> {
+    const url = `http://localhost:8080/roles`;
+    const response = await requestAdmin(url);
+    
+    if (!response || !response._embedded || !response._embedded.roles) {
+        throw new Error('Invalid response structure');
+    }
+    
+    const roles = response._embedded.roles;
+    let allUsers: UserModel[] = [];
+
+    for (const roleData of roles) {
+        const roleName = roleData.idRole;
+        const userListUrl = roleData._links.userList.href;
+
+        const users = await getUsersByRole(userListUrl, roleName);
+        allUsers = allUsers.concat(users);
+    }
+
+    return allUsers;
 }
 
 export async function get1User(idUser : any): Promise<UserModel> {

@@ -22,7 +22,7 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
     for (const key in responseData) {
         result.push({
             idBook: responseData[key].idBook,
-            nameBook: responseData[key].name,
+            nameBook: responseData[key].nameBook,
             listPrice: responseData[key].listPrice,
             sellPrice: responseData[key].sellPrice,
             quantity: responseData[key].quantity,
@@ -140,7 +140,6 @@ export async function getBookId(idBook: number): Promise<BookModel | null> {
         // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
         if (request) {
             bookResponse = request;
-            bookResponse.nameBook = request.name;
             // Trả về quyển sách
             const responseImg = await GetAllImage(request.idBook);
             const thumbnail = responseImg.filter((image) => image.icon);

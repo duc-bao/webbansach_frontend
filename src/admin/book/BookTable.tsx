@@ -26,6 +26,7 @@ export const BookTable: React.FC<BookTableProps> = (props) => {
         const fetchData = async () => {
             try {
                 const bookResponse = await getAllBook(1000, 0);
+                console.log(bookResponse);
                 const promises = bookResponse.result.map(async (book) => {
                     const imagesList = await GetAllImage(book.idBook);
                     const thumbnail = imagesList.find((image) => image.icon);

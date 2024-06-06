@@ -35,14 +35,33 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
             headerName: "VAI TRÒ",
             width: 150,
             renderCell: (params) => {
+                let label = '';
+            let color: 'success' | 'error' | 'default' = 'default';
+
+            switch (params.value) {
+                case 1:
+                    label = 'ADMIN';
+                    color = 'error';
+                    break;
+                case 2:
+                    label = 'STAFF';
+                    color = 'error';
+                    break;
+                case 3:
+                    label = 'CUSTOMER';
+                    color = 'success';
+                    break;
+                default:
+                    label = 'UNKNOWN';
+                    color = 'default';
+            }
+
                 return (
                     <Chip
-                        label={params.value}
-                        color={
-                            params.value === "CUSTOMER" ? "success" : "error"
-                        }
-                        variant="outlined"
-                    />
+                    label={label}
+                    color={color}
+                    variant="outlined"
+                />
                 );
             },
         },

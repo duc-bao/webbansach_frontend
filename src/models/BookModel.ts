@@ -5,8 +5,8 @@ class BookModel {
     nameBook?: string; //CO the null
     author?: string;
     ISBN?: string;
-    listPrice?: number;
-    sellPrice?: number;
+    listPrice: number;
+    sellPrice: number;
     quantity?: number;
     description?: string;
     avgRating?: number;

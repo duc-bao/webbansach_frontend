@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import BookModel from "../../models/BookModel";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { ShoppingCartOutlined, X } from "@mui/icons-material";
 import { getBookId } from "../../api/BookAPI";
 import Skeleton from "react-loading-skeleton";
@@ -21,9 +21,10 @@ import Comment from "./components/Comment";
 import { toast } from "react-toastify";
 import CartItemModel from "../../models/CartItemModel";
 import { useCartItem } from "../utils/CartItemContext";
+import { getIdUserByToken, isToken } from "../utils/JwtService";
+import { CheckoutPage } from "../page/CheckoutPage";
 interface BookDetailProps {
-    totalCart: number;
-    setTotalCart: any;
+   
 }
 
 const BookDetail: React.FC<BookDetailProps> = (props) => {
@@ -50,10 +51,6 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
             getBookId(idBookNumber)
                 .then((response) => {
                     if (response) {
-                        // Gán giá trị thuộc tính 'name' cho 'nameBook'
-                        response.nameBook = response.nameBook;
-                        // Xóa thuộc tính 'name' để tránh trùng lặp
-                        delete response.nameBook;
                         setBook(response);
                         setLoading(false);
                     } else {
@@ -134,63 +131,61 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
             isExistBook.quantity += quantity;
 
             // Lưu vào db
-            // if (isToken()) {
-            //     const request = {
-            //         idCart: isExistBook.idCart,
-            //         quantity: isExistBook.quantity,
-            //     };
-            //     const token = localStorage.getItem("token");
-            //     fetch(endpointBE + `/cart-item/update-item`, {
-            //         method: "PUT",
-            //         headers: {
-            //             Authorization: `Bearer ${token}`,
-            //             "content-type": "application/json",
-            //         },
-            //         body: JSON.stringify(request),
-            //     }).catch((err) => console.log(err));
-            // }
+            if (isToken()) {
+                const request = {
+                    idCart: isExistBook.idCart,
+                    quantity: isExistBook.quantity,
+                };
+                const token = localStorage.getItem("token");
+                fetch(`http://localhost:8080/cart-item/update-item`, {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify(request),
+                }).catch((err) => console.log(err));
+            }
         } else {
             // Lưu vào db
-            // if (isToken()) {
-            //     try {
-            //         const request = [
-            //             {
-            //                 quantity: quantity,
-            //                 book: newBook,
-            //                 idUser: getIdUserByToken(),
-            //             },
-            //         ];
-            //         const token = localStorage.getItem("token");
-            //         const response = await fetch(
-            //             endpointBE + "/cart-item/add-item",
-            //             {
-            //                 method: "POST",
-            //                 headers: {
-            //                     Authorization: `Bearer ${token}`,
-            //                     "content-type": "application/json",
-            //                 },
-            //                 body: JSON.stringify(request),
-            //             }
-            //         );
-            //         if (response.ok) {
-            //             const idCart = await response.json();
-            //             cartList.push({
-            //                 idCart: idCart,
-            //                 quantity: quantity,
-            //                 book: newBook,
-            //             });
-            //         }
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // } else {
-            //
-            //     });
-            // }
-            cartList.push({
-                quantity: quantity,
-                book: newBook,
-            });
+            if (isToken()) {
+                try {
+                    const request = [
+                        {
+                            quantity: quantity,
+                            book: newBook,
+                            idUser: getIdUserByToken(),
+                        },
+                    ];
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(
+                       "http://localhost:8080/cart-item/add-cart",
+                        {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "content-type": "application/json",
+                            },
+                            body: JSON.stringify(request),
+                        }
+                    );
+                    if (response.ok) {
+                        const idCart = await response.json();
+                        cartList.push({
+                            idCart: idCart,
+                            quantity: quantity,
+                            book: newBook,
+                        });
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            } else {
+                cartList.push({
+                    quantity: quantity,
+                    book: newBook,
+                });
+            }
         }
         // Lưu vào localStorage
         localStorage.setItem("cart", JSON.stringify(cartList));
@@ -198,6 +193,23 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
         toast.success("Thêm vào giỏ hàng thành công");
         setTotalCart(cartList.length);
     };
+    const navigation = useNavigate();
+    const [isCheckout, setIsCheckout] = useState(false);
+	const [cartItem, setCartItem] = useState<CartItemModel[]>([]);
+	const [totalPriceProduct, setTotalPriceProduct] = useState(0);
+	function handleBuyNow(newBook: BookModel) {
+        if (!isToken()) {
+            toast.warning(
+                "Bạn cần đăng nhập để thực hiện chức năng này"
+            );
+            navigation("/login");
+        } else {
+        const sellPrice = newBook.sellPrice ?? 0; 
+		setCartItem([{ quantity, book: newBook }]);
+		setIsCheckout(!isCheckout);
+		setTotalPriceProduct(sellPrice * quantity);
+        }
+	}
     if (loadData) {
         return (
             <div className="container-book container mb-5 py-5 px-5 bg-light">
@@ -227,7 +239,9 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
     }
     return (
         <>
+        {!isCheckout ? (
             <>
+            
                 <div className="container p-2 bg-white my-3 rounded">
                     <div className="row mt-4 mb-4">
                         <div className="col-lg-3 col-md-3 col-sm-12">
@@ -425,7 +439,7 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
                                                     }
                                                     className="me-3"
                                                     onClick={() =>
-                                                        handleAddProduct(book)  
+                                                        handleAddProduct(book)
                                                     }
                                                 >
                                                     Thêm vào giỏ hàng
@@ -434,7 +448,7 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
                                                     variant="contained"
                                                     size="large"
                                                     className="me-3"
-                                                    // onClick={() => handleBuyNow(book)}
+                                                    onClick={() => handleBuyNow(book)}
                                                 >
                                                     Mua ngay
                                                 </Button>
@@ -446,14 +460,32 @@ const BookDetail: React.FC<BookDetailProps> = (props) => {
                         </div>
                     </div>
                 </div>
-
+                <div className='container p-4 bg-white my-3 rounded'>
+						<h5 className='my-3'>Mô tả sản phẩm</h5>
+						<hr />
+						<TextEllipsis
+							isShow={true}
+							text={book?.description + ""}
+							limit={10000}
+						/>
+					</div>
                 <div className="container p-4 bg-white my-3 rounded">
                     <h5 className="my-3">Khách hàng đánh giá</h5>
                     <hr />
                     <Comment idBook={idBookNumber} />
                 </div>
+                
             </>
+            ):(
+				<CheckoutPage
+					setIsCheckout={setIsCheckout}
+					cartList={cartItem}
+					totalPriceProduct={totalPriceProduct}
+					isBuyNow={true}
+				/>
+			)}
         </>
+        
     );
 };
 export default BookDetail;

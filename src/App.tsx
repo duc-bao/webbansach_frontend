@@ -25,7 +25,8 @@ import { ConfirmProvider } from "material-ui-confirm";
 import { ForgotPassword } from "./layout/User/FogotPassword";
 import { ProfilePage } from "./layout/User/ProfilePage";
 import PolicyPage from "./layout/page/PolicyPage";
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -85,8 +86,7 @@ const MyRoutes = () => {
                         path="/book/:idBook"
                         element={
                             <BookDetail
-                                setTotalCart={setTotalCart}
-                                totalCart={totalCart}
+                               
                             ></BookDetail>
                         }
                     />
@@ -164,6 +164,11 @@ const MyRoutes = () => {
                     </div>
                 )}
                 {!isAdmin && <Footer></Footer>}
+                <ToastContainer
+						position='bottom-center'
+						autoClose={3000}
+						pauseOnFocusLoss={false}
+					/>
                 </ConfirmProvider>
             </CartItemContext>
         </AuthoProvider>

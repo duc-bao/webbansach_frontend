@@ -136,9 +136,11 @@ export async function getBookId(idBook: number): Promise<BookModel | null> {
     try {
         // Gọi phương thức request()
         const request = await my_request(url);
+        console.log(request);
         // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
         if (request) {
             bookResponse = request;
+            bookResponse.nameBook = request.name;
             // Trả về quyển sách
             const responseImg = await GetAllImage(request.idBook);
             const thumbnail = responseImg.filter((image) => image.icon);

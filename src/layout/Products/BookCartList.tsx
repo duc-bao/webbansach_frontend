@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { useCartItem } from "../utils/CartItemContext";
 import { toast } from "react-toastify";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import { BookCartProps } from "./components/BookCartProps";
 import CartItemModel from "../../models/CartItemModel";
+import { CheckoutPage } from "../page/CheckoutPage";
+import { isToken } from "../utils/JwtService";
 
 interface BookCartListInterface {
     cartList: CartItemModel[];
@@ -13,6 +15,7 @@ interface BookCartListInterface {
 }
 
 export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
+    const navigation = useNavigate();
     const { setTotalCart, cartList, setCartList } = useCartItem();
     const [totalPriceProduct, setTotalPriceProduct] = useState(0);
     useEffect(() => {
@@ -37,7 +40,10 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
         setTotalCart(newCartList.length);
         toast.success("Xoá sản phẩm thành công");
     }
+    const [isCheckout, setIsCheckout] = useState(false);
     return (
+        <>
+			{!isCheckout ? (
         <div style={{ overflow: "hidden" }}>
             {cartList.length === 0 && (
                 <div className="d-flex align-items-center justify-content-center flex-column position-relative">
@@ -120,21 +126,29 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
                     <Button
                         variant="contained"
                         sx={{ width: "100%", marginTop: "30px" }}
-                        // onClick={() => {
-                        //     if (isToken()) {
-                        //         setIsCheckout(true);
-                        //     } else {
-                        //         toast.warning(
-                        //             "Bạn cần đăng nhập để thực hiện chức năng này"
-                        //         );
-                        //         navigation("/login");
-                        //     }
-                        // }}
+                        onClick={() => {
+                            if (isToken()) {
+                                setIsCheckout(true);
+                            } else {
+                                toast.warning(
+                                    "Bạn cần đăng nhập để thực hiện chức năng này"
+                                );
+                                navigation("/login");
+                            }
+                        }}
                     >
                         Thanh toán
                     </Button>
                 </div>
             </div>
         </div>
+        ) : (
+            <CheckoutPage
+                setIsCheckout={setIsCheckout}
+                cartList={cartList}
+                totalPriceProduct={totalPriceProduct}
+            />
+        )}
+    </>
     );
 };

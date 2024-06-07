@@ -12,7 +12,7 @@ const UserManagement : React.FC = () =>{
 	const [openModal, setOpenModal] = useState(false);
 	const handleOpenModal = () => setOpenModal(true);
 	const handleCloseModal = () => setOpenModal(false);
-
+	const [id, setId] = useState<number>(0);
     return (
         <div className='conatiner p-5'>
 			<div className='shadow-4-strong rounded p-5'>
@@ -35,6 +35,7 @@ const UserManagement : React.FC = () =>{
 						setOption={setOption}
 						handleOpenModal={handleOpenModal}
 						setKeyCountReload={setKeyCountReload}
+						setId={setId}
 					/>
 				</div>
 			</div>
@@ -43,7 +44,10 @@ const UserManagement : React.FC = () =>{
 				handleOpen={handleOpenModal}
 				handleClose={handleCloseModal}
 			>
-				<UserForm option={option} setKeyCountReload={setKeyCountReload} />
+				<UserForm option={option}
+					setKeyCountReload={setKeyCountReload}
+					id={id}
+					handleCloseModal={handleCloseModal} />
 			</FadeModal>
 		</div>
     )

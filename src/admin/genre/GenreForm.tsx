@@ -1,6 +1,6 @@
 import { FormEvent, useEffect, useState } from "react";
 import CategoryModel from "../../models/CategoryModel";
-import { getGenreByID } from "../../api/GenreAPI";
+import { getGenreByID, getGenreByIDBook } from "../../api/GenreAPI";
 import { Box, TextField, Typography } from "@mui/material";
 import { toast } from "react-toastify";
 
@@ -17,10 +17,10 @@ export const GenreForm: React.FC<GenreFormProps> = (props) => {
     });
     useEffect(() => {
         if (props.option === "update") {
-            getGenreByID(props.id).then((response) => {
+            getGenreByIDBook(props.id).then((response) => {
                 setGenre({
-                    idCategory: response.genre.idCategory,
-                    nameCategory: response.genre.nameCategory,
+                    idCategory: response.idCategory,
+                    nameCategory: response.nameCategory,
                 });
             });
         }
@@ -32,8 +32,8 @@ export const GenreForm: React.FC<GenreFormProps> = (props) => {
         const method = props.option === "add" ? "POST" : "PUT";
         const endpoint =
             props.option === "add"
-                ? "http://localhost:8080/genre"
-                : `http://localhost:8080/genre/${props.id}`;
+                ? "http://localhost:8080/categories"
+                : `http://localhost:8080/categories/${props.id}`;
         fetch(endpoint, {
             method: method,
             headers: {

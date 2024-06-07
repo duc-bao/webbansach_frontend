@@ -43,7 +43,7 @@ const GenreTable : React.FC<GenreTableProps> = (props) =>{
             confirmationText:["Xóa"],
             cancellationText:["Hủy"],
         }).then(() =>{
-            fetch(`http://localhost:8080/genre/${id}`,{
+            fetch(`http://localhost:8080/categories/${id}`,{
                 method:"DELETE",
                 headers:{
                     Authorization: `Bearer ${token}`

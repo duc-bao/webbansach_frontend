@@ -26,3 +26,12 @@ export async function getGenreByID(id : number) {
     const url = `http://localhost:8080/books/${id}/categoryList`
     return getGenre(url);
 }
+export async function getGenreByIDBook(id : number) : Promise<CategoryModel> {
+    const url = `http://localhost:8080/books/${id}/categoryList`
+    const response = await my_request(url);
+    const genre : CategoryModel = {
+        idCategory : response.idCategory,
+        nameCategory : response.nameCategory
+    }
+    return genre;
+}

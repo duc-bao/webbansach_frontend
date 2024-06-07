@@ -32,7 +32,7 @@ const GenreManagement = () => {
                 <div>
                     <GenreTable
                         keyCountReload= {keyCountReload}
-                        setOption = {option}
+                        setOption = {setOption}
                         setId = {setId}
                         handleOpenModal= {handleOpenModal}
                         setKeyCountReload = {setKeyCountReload}

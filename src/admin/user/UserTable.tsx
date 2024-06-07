@@ -7,11 +7,14 @@ import { Chip, IconButton, Tooltip } from "@mui/material";
 import { DeleteOutlineOutlined, VisibilityOutlined } from "@mui/icons-material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { DataTable } from "../../layout/utils/DataTable";
+import { confirm } from "material-ui-confirm";
+import { toast } from "react-toastify";
 interface UserTableProps {
-    keyCountReload?: any;
     setOption: any;
-    handleOpenModal: any;
-    setKeyCountReload?: any;
+	handleOpenModal: any;
+	setKeyCountReload?: any;
+	keyCountReload?: any;
+	setId: any;
 }
 
 export const UserTable: React.FC<UserTableProps> = (props) => {
@@ -19,14 +22,46 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
     useEffect(() => {
         getAllUser()
             .then((response) => {
-                const users = response
+                let users = response
                     .map((user) => ({ ...user, id: user.idUser }));
-
+                    users = users.sort((u1, u2) => u1.idUser - u2.idUser);
+                    setData(users);
                 setData(users);
+                console.log(response);
             })
             .catch((error) => console.log(error));
     }, [props.keyCountReload]);
 
+    const handleDeleteUser = (id:any)=>{
+        const token = localStorage.getItem("token");
+        confirm({
+            title:"Xóa người dùng",
+            description:"Bạn có chắc chắn muốn xóa người dùng này",
+            confirmationText:["Xóa"],
+            cancellationText:["Hủy"],
+        }).then(() =>{
+            fetch(`http://localhost:8080/users/${id}`,{
+                method:"DELETE",
+                headers:{
+                    Authorization:`Bearer ${token}`,
+                }
+            }
+            ).then(
+                (response) =>{
+                    if(response.ok){
+                        toast.success("Xóa người dùng thành công");
+                        props.setKeyCountReload(Math.random());
+
+                    }else {
+                        toast.error("Xóa người dùng thất bại");
+                    }
+                }
+            ).catch((error) =>{
+                toast.error("Lỗi khi xóa thể loại");
+                console.log(error);
+            })
+        }).catch(()=>{})
+    }
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 50 },
         { field: "username", headerName: "TÊN TÀI KHOẢN", width: 120 },
@@ -82,7 +117,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
             renderCell: (item) => {
                 return (
                     <div>
-                        <Tooltip title={"Xem chi tiết"}>
+                        {/* <Tooltip title={"Xem chi tiết"}>
                             <IconButton
                                 color="secondary"
                                 onClick={() => {
@@ -92,11 +127,12 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                             >
                                 <VisibilityOutlined />
                             </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                         <Tooltip title={"Chỉnh sửa"}>
                             <IconButton
                                 color="primary"
                                 onClick={() => {
+                                    props.setId(item.id);
                                     props.setOption("update");
                                     props.handleOpenModal();
                                 }}
@@ -107,7 +143,7 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                         <Tooltip title={"Xoá"}>
                             <IconButton
                                 color="error"
-                                onClick={() => console.log("Xoá: " + item.id)}
+                                onClick={() => {handleDeleteUser(item.id)}}
                             >
                                 <DeleteOutlineOutlined />
                             </IconButton>

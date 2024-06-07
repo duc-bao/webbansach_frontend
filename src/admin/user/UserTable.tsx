@@ -11,10 +11,10 @@ import { confirm } from "material-ui-confirm";
 import { toast } from "react-toastify";
 interface UserTableProps {
     setOption: any;
-	handleOpenModal: any;
-	setKeyCountReload?: any;
-	keyCountReload?: any;
-	setId: any;
+    handleOpenModal: any;
+    setKeyCountReload?: any;
+    keyCountReload?: any;
+    setId: any;
 }
 
 export const UserTable: React.FC<UserTableProps> = (props) => {
@@ -23,45 +23,46 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
         getAllUser()
             .then((response) => {
                 let users = response
+                    .flat()
                     .map((user) => ({ ...user, id: user.idUser }));
-                    users = users.sort((u1, u2) => u1.idUser - u2.idUser);
-                    setData(users);
+                users = users.sort((u1, u2) => u1.idUser - u2.idUser);
+                setData(users);
                 setData(users);
                 console.log(response);
             })
             .catch((error) => console.log(error));
     }, [props.keyCountReload]);
 
-    const handleDeleteUser = (id:any)=>{
+    const handleDeleteUser = (id: any) => {
         const token = localStorage.getItem("token");
         confirm({
-            title:"Xóa người dùng",
-            description:"Bạn có chắc chắn muốn xóa người dùng này",
-            confirmationText:["Xóa"],
-            cancellationText:["Hủy"],
-        }).then(() =>{
-            fetch(`http://localhost:8080/users/${id}`,{
-                method:"DELETE",
-                headers:{
-                    Authorization:`Bearer ${token}`,
-                }
-            }
-            ).then(
-                (response) =>{
-                    if(response.ok){
-                        toast.success("Xóa người dùng thành công");
-                        props.setKeyCountReload(Math.random());
-
-                    }else {
-                        toast.error("Xóa người dùng thất bại");
-                    }
-                }
-            ).catch((error) =>{
-                toast.error("Lỗi khi xóa thể loại");
-                console.log(error);
+            title: "Xóa người dùng",
+            description: "Bạn có chắc chắn muốn xóa người dùng này",
+            confirmationText: ["Xóa"],
+            cancellationText: ["Hủy"],
+        })
+            .then(() => {
+                fetch(`http://localhost:8080/users/${id}`, {
+                    method: "DELETE",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                })
+                    .then((response) => {
+                        if (response.ok) {
+                            toast.success("Xóa người dùng thành công");
+                            props.setKeyCountReload(Math.random());
+                        } else {
+                            toast.error("Xóa người dùng thất bại");
+                        }
+                    })
+                    .catch((error) => {
+                        toast.error("Lỗi khi xóa thể loại");
+                        console.log(error);
+                    });
             })
-        }).catch(()=>{})
-    }
+            .catch(() => {});
+    };
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 50 },
         { field: "username", headerName: "TÊN TÀI KHOẢN", width: 120 },
@@ -70,34 +71,28 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
             headerName: "VAI TRÒ",
             width: 150,
             renderCell: (params) => {
-                let label = '';
-            let color: 'success' | 'error' | 'default' = 'default';
+                let label = "";
+                let color: "success" | "error" | "default" = "default";
 
-            switch (params.value) {
-                case 1:
-                    label = 'ADMIN';
-                    color = 'error';
-                    break;
-                case 2:
-                    label = 'STAFF';
-                    color = 'error';
-                    break;
-                case 3:
-                    label = 'CUSTOMER';
-                    color = 'success';
-                    break;
-                default:
-                    label = 'UNKNOWN';
-                    color = 'default';
-            }
+                switch (params.value) {
+                    case 1:
+                        label = "ADMIN";
+                        color = "error";
+                        break;
+                    case 2:
+                        label = "STAFF";
+                        color = "error";
+                        break;
+                    case 3:
+                        label = "CUSTOMER";
+                        color = "success";
+                        break;
+                    default:
+                        label = "UNKNOWN";
+                        color = "default";
+                }
 
-                return (
-                    <Chip
-                    label={label}
-                    color={color}
-                    variant="outlined"
-                />
-                );
+                return <Chip label={label} color={color} variant="outlined" />;
             },
         },
         { field: "lastName", headerName: "TÊN", width: 100 },
@@ -143,7 +138,9 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
                         <Tooltip title={"Xoá"}>
                             <IconButton
                                 color="error"
-                                onClick={() => {handleDeleteUser(item.id)}}
+                                onClick={() => {
+                                    handleDeleteUser(item.id);
+                                }}
                             >
                                 <DeleteOutlineOutlined />
                             </IconButton>

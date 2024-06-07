@@ -1,3 +1,4 @@
+import CartItemModel from "./CartItemModel"
 import UserModel from "./UserModel"
 
 class OrderModel{
@@ -17,6 +18,7 @@ class OrderModel{
     statusDelivery?: string
     user ?: UserModel
     payment?: string;
+    cartItems?: CartItemModel[];
     constructor(idOrder: number,
         deliveryAddress: string,
         totalPrice: number,

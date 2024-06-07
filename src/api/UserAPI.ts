@@ -19,7 +19,6 @@ async function getUsersByRole(userListUrl: string, roleName: number): Promise<Us
     if (!response || !response._embedded || !response._embedded.users) {
         return [];
     }
-
     const users = response._embedded.users.map((userData: any) => {
         const user: UserModel = {
             idUser: userData.idUser,
@@ -50,15 +49,22 @@ export async function getAllUser(): Promise<UserModel[]> {
     
     const roles = response._embedded.roles;
     let allUsers: UserModel[] = [];
+    const userIdSet = new Set<number>();
 
     for (const roleData of roles) {
         const roleName = roleData.idRole;
         const userListUrl = roleData._links.userList.href;
 
         const users = await getUsersByRole(userListUrl, roleName);
-        allUsers = allUsers.concat(users);
+       // Filter out duplicate users based on idUser
+       users.forEach(user => {
+        if (!userIdSet.has(user.idUser)) {
+            userIdSet.add(user.idUser);
+            allUsers.push(user);
+        }
+    });
     }
-
+    console.log(allUsers);
     return allUsers;
 }
 

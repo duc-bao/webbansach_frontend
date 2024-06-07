@@ -1,96 +1,184 @@
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import OrderModel from "../../models/OrderModel";
-import { Box, TextField, Typography } from "@mui/material";
+import {
+    Box,
+    Button,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography,
+} from "@mui/material";
+import { get1Order } from "../../api/OrderAPI";
+import { toast } from "react-toastify";
+import { OrderDetail } from "../../layout/Products/components/order-detail/OrderDetail";
 
 interface OrderFormProps {
-	id: any;
-	option?: string;
-	setKeyCountReload?: any;
-	handleCloseModal?: any;
+    id: any;
+    option?: string;
+    setKeyCountReload?: any;
+    handleCloseModal?: any;
 }
 
 export const OrderForm: React.FC<OrderFormProps> = (props) => {
     const [order, setOrder] = useState<OrderModel>({
-		idOrder: 0,
-		deliveryAddress: "",
-		totalPrice: 0,
-		totalPriceProduct: 0,
-		feeDelivery: 0,
-		feePayment: 0,
-		dateOrder: new Date(),
-		status: "",
-	});
-    const handleSubmit = (event: FormEvent<HTMLFormElement>) =>{
+        idOrder: 0,
+        deliveryAddress: "",
+        totalPrice: 0,
+        totalPriceProduct: 0,
+        feeDelivery: 0,
+        feePayment: 0,
+        dateOrder: new Date(),
+        status: "",
+    });
+    // Step
+    const [steps, setSteps] = useState<String[]>([]);
+    const [activeStep, setActiveStep] = useState(0);
+    // Lấy 1 đơn hàng khi cập nhật
+    useEffect(() => {
+        get1Order(props.id)
+            .then((response) => {
+                setOrder(response);
+                if (response.status === "Bị huỷ") {
+                    setSteps(["Đang xử lý", "Bị huỷ"]);
+                    setActiveStep(
+                        ["Đang xử lý", "Bị huỷ"].indexOf(response.status)
+                    );
+                } else {
+                    setSteps(["Đang xử lý", "Đang giao hàng", "Thành công"]);
+                    setActiveStep(
+                        ["Đang xử lý", "Đang giao hàng", "Thành công"].indexOf(
+                            response.status
+                        )
+                    );
+                }
+            })
+            .catch((error) => console.log(error));
+    }, [props.option, props.id]);
+    const hanleSubmit = (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         const token = localStorage.getItem("token");
-        fetch("http://localhost:8080/",{
-            method: "POST",
-			headers: {
-				Authorization: `Bearer ${token}`,
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(order),
-        }).then((response) =>{
-            if(response.ok){
-                props.setKeyCountReload(Math.random());
-            }else {
-                alert("Gặp lỗi trong quá trình cập nhật hoá đơn");
-            }
-        }).catch((error) => console.log(error));
-    }
+        fetch("http://localhost:8080/order/update-order", {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(order),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    props.setKeyCountReload(Math.random());
+                    toast.success("Cập nhật đơn hàng thành công");
+                    props.handleCloseModal();
+                } else {
+                    toast.error("Gặp lỗi trong quá trình cập nhật đơn hàng");
+                }
+            })
+            .catch((error) => console.log(error));
+    };
+    const handleCancleOrder = () => {
+        const token = localStorage.getItem("token");
+
+        fetch( "http://localhost:8080/order/update-order", {
+            method: "PUT",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...order, status: "Bị huỷ" }),
+        })
+            .then((response) => {
+                if (response.ok) {
+                    props.setKeyCountReload(Math.random());
+                    toast.success("Huỷ đơn hàng thành công");
+                    props.handleCloseModal();
+                } else {
+                    toast.error("Gặp lỗi trong quá trình huỷ đơn hàng");
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+                toast.error("Gặp lỗi trong quá trình huỷ đơn hàng");
+            });
+    };
     return (
         <div>
-            <Typography
-                className="text-center" variant="h4" component= "h2"
-            >{props.option === "update" ? "CẬP NHẬT ĐƠN HÀNG" : "XEM CHI TIẾT"}</Typography>
+            <Typography className="text-center" variant="h4" component="h2">
+                {props.option === "update"
+                    ? "CẬP NHẬT ĐƠN HÀNG"
+                    : "XEM CHI TIẾT"}
+            </Typography>
             <hr />
             <div className="container p-5">
-            <form onSubmit={handleSubmit} className='form'>
-					<input type='hidden' value={order.idOrder} hidden />
-					<Box
-						sx={{
-							"& .MuiTextField-root": { mb: 3 },
-						}}
-					>
-						<TextField
-							required
-							id='filled-required'
-							label='Ngày tạo'
-							style={{ width: "100%" }}
-							value={order.dateOrder.toISOString().substring(0, 10)}
-							type='date'
-							onChange={(e) =>
-								setOrder({
-									...order,
-									dateOrder: new Date(e.target.value),
-								})
-							}
-							size='small'
-						/>
-
-						<TextField
-							required
-							id='filled-required'
-							label='Địa chỉ giao hàng'
-							style={{ width: "100%" }}
-							value={order.deliveryAddress}
-							onChange={(e) =>
-								setOrder({
-									...order,
-									deliveryAddress: e.target.value,
-								})
-							}
-							size='small'
-						/>
-					</Box>
-					{props.option !== "view" && (
-						<button className='btn btn-primary w-100 my-3' type='submit'>
-							Lưu đơn hàng
-						</button>
-					)}
-				</form>
-			</div>
+                <form onSubmit={hanleSubmit} className="form">
+                    <input type="hidden" value={order.idOrder} hidden />
+                    {props.option === "update" ? (
+                        <FormControl sx={{ m: 1 }} size="small" fullWidth>
+                            <InputLabel id="demo-simple-select-helper-label">
+                                Trạng thái đơn hàng
+                            </InputLabel>
+                            <Select
+                                labelId="demo-simple-select-helper-label"
+                                id="demo-simple-select-helper"
+                                value={order.status}
+                                label="Trạng thái đơn hàng"
+                                autoWidth
+                                onChange={(e) =>
+                                    setOrder({
+                                        ...order,
+                                        status: e.target.value,
+                                    })
+                                }	
+                            >
+                                <MenuItem value="Đang xử lý">
+                                    Đang xử lý
+                                </MenuItem>
+                                <MenuItem value="Đang giao hàng">
+                                    Đang giao hàng
+                                </MenuItem>
+                                <MenuItem value="Thành công">
+                                    Thành công
+                                </MenuItem>
+                                <MenuItem value="Bị huỷ">Huỷ</MenuItem>
+                            </Select>
+                        </FormControl>
+                    ) : (
+                        <>
+                            {props.option === "view-customer" &&
+                                order.status === "Đang xử lý" && (
+                                    <>
+                                        <Button
+                                            className="me-3"
+                                            variant="contained"
+                                            color="error"
+                                            onClick={() => handleCancleOrder()}
+                                        >
+                                            huỷ đơn hàng
+                                        </Button>
+                                    </>
+                                )}
+                            <OrderDetail
+                                order={order}
+                                steps={steps}
+                                activeStep={activeStep}
+                                handleCloseModal={props.handleCloseModal}
+                                type={props.option}
+                            />
+                        </>
+                    )}
+                    {props.option !== "view-customer" &&
+                        props.option !== "view" && (
+                            <button
+                                className="btn btn-primary w-100 my-3"
+                                type="submit"
+                            >
+                                Cập nhật đơn hàng
+                            </button>
+                        )}
+                </form>
             </div>
-    )
-
-}
+        </div>
+    );
+};

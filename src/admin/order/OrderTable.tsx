@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react"
-import { getAllOrder } from "../../api/OrderAPI"
+
 import OrderModel from "../../models/OrderModel"
 import { Chip, IconButton, Tooltip } from "@mui/material"
 import { GridColDef } from "@mui/x-data-grid"
 import { DeleteOutlineOutlined, VisibilityOutlined } from "@mui/icons-material";
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import { DataTable } from "../../layout/utils/DataTable"
+import { getAllOrders } from "../../api/OrderAPI";
+import { confirm } from "material-ui-confirm";
+import { toast } from "react-toastify";
 
 interface OrderTableProps {
     keyCountReload ?: any
@@ -19,7 +22,7 @@ export  const OrderTable : React.FC<OrderTableProps> = (props) =>{
     // Tạo biến để lấy tất cả data
 	const [data, setData] = useState<OrderModel[]>([]);
 	useEffect(() => {
-		getAllOrder()
+		getAllOrders()
 			.then((response) => {
 				const orders = response.map((order) => ({
 					...order,
@@ -32,9 +35,36 @@ export  const OrderTable : React.FC<OrderTableProps> = (props) =>{
 			.catch((error) => console.log(error));
 	}, [props.keyCountReload]);
 
+	// const handleDelete = (id:any) =>{
+	// 	const token = localStorage.getItem("token");
+	// 	confirm({
+	// 		title: "Xóa người dùng",
+    //         description: "Bạn có chắc chắn muốn xóa người dùng này",
+    //         confirmationText: ["Xóa"],
+    //         cancellationText: ["Hủy"],
+	// 	}).then(()=>{
+	// 		fetch(`http://localhost:8080/orders/${id}`, 
+	// 		{
+	// 			method:"DELETE",
+	// 			headers: {
+	// 				Authorization:`Bearer ${token}`
+	// 			}
+	// 		}
+	// 	).then((response) =>{
+	// 		if(response.ok){
+	// 			toast.success("Xoá đơn hàng thành công");
+	// 			props.setKeyCountReload(Math.random());
+	// 		}else {
+	// 			toast.error("Xóa người dùng thất bại");
+	// 		}
+	// 	})
+	// 	})
+		
+
+	// }
     const columns: GridColDef[] = [
 		{ field: "id", headerName: "ID", width: 80 },
-		{ field: "nameCustomer", headerName: "TÊN KHÁC HÀNG", width: 200 },
+		{ field: "user", headerName: "TÊN KHÁC HÀNG", width: 200 },
 		{ field: "dateCreated", headerName: "NGÀY TẠO", width: 100 },
 		{ field: "totalPrice", headerName: "TỔNG TIỀN", width: 120 },
 		{
@@ -73,6 +103,7 @@ export  const OrderTable : React.FC<OrderTableProps> = (props) =>{
 								color='secondary'
 								onClick={() => {
 									props.setOption("view");
+									props.setId(item.id);
 									props.handleOpenModal();
 								}}
 							>
@@ -84,20 +115,21 @@ export  const OrderTable : React.FC<OrderTableProps> = (props) =>{
 								color='primary'
 								onClick={() => {
 									props.setOption("update");
+									props.setId(item.id);
 									props.handleOpenModal();
 								}}
 							>
 								<EditOutlinedIcon   />
 							</IconButton>
 						</Tooltip>
-						<Tooltip title={"Xoá"}>
+						{/* <Tooltip title={"Xoá"}>
 							<IconButton
 								color='error'
 								onClick={() => console.log("Xoá: " + item.id)}
 							>
 								<DeleteOutlineOutlined />
 							</IconButton>
-						</Tooltip>
+						</Tooltip> */}
 					</div>
 				);
 			},

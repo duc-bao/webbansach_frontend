@@ -27,6 +27,7 @@ import { ProfilePage } from "./layout/User/ProfilePage";
 import PolicyPage from "./layout/page/PolicyPage";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import MyFavoriteBooksPage from "./layout/page/MyFavoritePage";
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -96,6 +97,7 @@ const MyRoutes = () => {
                             <CartPage ></CartPage>
                         }
                     ></Route>
+                    <Route path="/my-favorite-books" element = {<MyFavoriteBooksPage></MyFavoriteBooksPage>}></Route>
                     <Route
                         path="/register"
                         element={<RegisterPage></RegisterPage>}

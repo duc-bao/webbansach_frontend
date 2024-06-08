@@ -42,7 +42,7 @@ export const ReviewForm: React.FC<ReviewFormProps> = (props) => {
 			? "/review/update-review"
 			: "/review/add-review";
 		const method = props.cartItem?.review ? "PUT" : "POST";
-		fetch(`http://localhost:8080/${endpoint}`, {
+		fetch(`http://localhost:8080${endpoint}`, {
 			method: method,
 			headers: {
 				Authorization: `Bearer ${token}`,

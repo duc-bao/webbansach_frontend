@@ -1,80 +1,108 @@
-import Tooltip from "@mui/material/Tooltip";
-import React from "react";
+/* eslint-disable jsx-a11y/anchor-is-valid */
+import React, { useEffect, useState } from "react";
+
+import { getIdUserByToken } from "../utils/JwtService";
+
+import BookProps from "./components/BookProps";
+
+import { Button, Skeleton } from "@mui/material";
 import { Link } from "react-router-dom";
-import TextEllipsis from "./components/text-elip/TextElipsis";
+import BookModel from "../../models/BookModel";
+import { getBookId } from "../../api/BookAPI";
 
+interface FavoriteBooksListProps {}
 
-const FavoriteBooksList: React.FC = () => {
-    return (
-        <div className="container-book container mb-5 pb-5 px-5 bg-light">
-            <h2 className="mt-4 px-3 py-3 mb-0">SÁCH YÊU THÍCH CỦA TÔI</h2>
-            <hr className="mt-0" />
-            <div className="row">
-                <div className="col-md-6 col-lg-3 mt-3">
-                    <div className="card position-relative">
-                        <h4
-                            className="my-0 d-inline-block position-absolute end-0"
-                            style={{ top: "15px" }}
-                        >
-                            <span className="badge bg-primary">15%</span>
-                        </h4>
-                        <Link to={"/"}>
-                            <img
-                                src={
-                                    "https://cdn0.fahasa.com/media/catalog/product/d/a/dat-rung-phuong-nam_ban-dien-anh_bia.jpg"
-                                }
-                                className="card-img-top mt-3"
-                                alt={"Đất rừng phương nam"}
-                                style={{ height: "300px" }}
-                            />
-                        </Link>
-                        <div className="card-body">
-                            <Link to={"/"} style={{ textDecoration: "none" }}>
-                                <h5 className="card-title">
-                                    <Tooltip
-                                        title={"Đất rừng phương nam"}
-                                        arrow
-                                    >
-                                        <span>
-                                            <TextEllipsis
-                                                text={"Đất rừng phương nam"}
-                                                limit={20}
-                                            />
-                                        </span>
-                                    </Tooltip>
-                                </h5>
-                            </Link>
-                            <div className="price mb-3">
-                                <span className="discounted-price text-danger">
-                                    <strong style={{ fontSize: "22px" }}>
-                                        {"18000".toLocaleString()}đ
-                                    </strong>
-                                </span>
-                                <span className="original-price ms-3 small">
-                                    <del>{"20000".toLocaleString()}đ</del>
-                                </span>
-                            </div>
-                            <div className="row mt-2" role="group">
-                                <div className="col-6">
-                                    <a
-                                        href="#"
-                                        className="btn btn-secondary btn-block"
-                                    >
-                                        <i className="fas fa-heart"></i>
-                                    </a>
-                                </div>
-                                <div className="col-6">
-                                    <button className="btn btn-primary btn-block">
-                                        <i className="fas fa-shopping-cart"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+const FavoriteBooksList: React.FC<FavoriteBooksListProps> = (props) => {
+	const [bookList, setBookList] = useState<BookModel[]>([]);
+	const [loading, setLoading] = useState(true);
+	const [reloadComponent] = useState(0);
+
+	useEffect(() => {
+		fetch(
+			 `http://localhost:8080/favorite-book/get-favorite-book/${getIdUserByToken()}`
+		)
+			.then((response) => response.json())
+			.then((idBookList) => {
+				const fetchBookPromises = idBookList.map(async (idBook: any) => {
+					const response = await getBookId(idBook);
+					return response;
+				});
+
+				// Sử dụng Promise.all để đợi tất cả các yêu cầu fetch hoàn thành
+				return Promise.all(fetchBookPromises);
+			})
+			.then((books) => {
+				// Xử lý danh sách sách ở đây (mảng 'books')
+				setBookList(books);
+				setLoading(false);
+			})
+			.catch((error) => {
+				setLoading(false);
+				console.log(error);
+			});
+	}, []);
+
+	if (loading) {
+		return (
+			<div className='container-book container mb-5 py-5 px-5 bg-light'>
+				<div className='row'>
+					<div className='col-md-6 col-lg-3 mt-3'>
+						<Skeleton
+							className='my-3'
+							variant='rectangular'
+							height={400}
+						/>
+					</div>
+					<div className='col-md-6 col-lg-3 mt-3'>
+						<Skeleton
+							className='my-3'
+							variant='rectangular'
+							height={400}
+						/>
+					</div>
+					<div className='col-md-6 col-lg-3 mt-3'>
+						<Skeleton
+							className='my-3'
+							variant='rectangular'
+							height={400}
+						/>
+					</div>
+					<div className='col-md-6 col-lg-3 mt-3'>
+						<Skeleton
+							className='my-3'
+							variant='rectangular'
+							height={400}
+						/>
+					</div>
+				</div>
+			</div>
+		);
+	}
+
+	return (
+		<div className='container-book container mb-5 pb-5 px-5 bg-light'>
+			<h2 className='mt-4 px-3 py-3 mb-0'>SÁCH YÊU THÍCH</h2>
+			<hr className='mt-0' />
+			<div className='row' key={reloadComponent}>
+				{bookList.length > 0 ? (
+					bookList.map((book) => (
+						<BookProps key={book.idBook} book={book} />
+					))
+				) : (
+					<div className='d-flex align-items-center justify-content-center flex-column'>
+						<h4 className='text-center'>
+							Bạn chưa yêu thích quyển sách nào
+						</h4>
+						<Link to={"/search"}>
+							<Button variant='contained' className='mt-3'>
+								Kho sách
+							</Button>
+						</Link>
+					</div>
+				)}
+			</div>
+		</div>
+	);
 };
 
 export default FavoriteBooksList;

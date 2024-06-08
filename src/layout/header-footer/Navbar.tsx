@@ -7,6 +7,7 @@ import { Avatar, Button } from "@mui/material";
 import { useCartItem } from "../utils/CartItemContext";
 import { useAuth } from "../utils/AuthorizationContext";
 import { AdminEnpoint } from "../../admin/AdminEndpoint";
+import FavoriteIcon from '@mui/icons-material/Favorite';
 import {
     getAvatarByToken,
     getLastNameByToken,
@@ -163,6 +164,15 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                         </Link>
                     </li>
                 </ul>
+                {isToken() &&
+                (
+                <Link to = {"/my-favorite-books"}>
+                    <Button>
+                        <FavoriteIcon></FavoriteIcon>
+                    </Button> 
+                </Link>  
+                )}
+                
                 {/* Đăng kí đăng nhập */}
                 {!isToken() && (
                     <div>

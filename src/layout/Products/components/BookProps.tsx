@@ -2,7 +2,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import { IconButton } from "@mui/material";
 import Tooltip from "@mui/material/Tooltip";
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { GetAllImage } from "../../../api/ImageAPI";
 import BookModel from "../../../models/BookModel";
@@ -21,7 +21,27 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
     const [imageList, setImageList] = useState<ImageModel[]>([]);
     const [loadData, setLoadData] = useState(true);
     const [errors, setError] = useState(null);
+    const [isFavoriteBook, setIsFavoriteBook] = useState(false);
+    const navigation = useNavigate();
     const maxLines = 2;
+    // Lấy tất cả sách yêu thích của người dùng đã đăng nhập ra
+	useEffect(() => {
+		if (isToken()) {
+			fetch(
+					`http://localhost:8080/favorite-book/get-favorite-book/${getIdUserByToken()}`
+			)
+				.then((response) => response.json())
+				.then((data) => {
+                    console.log(data);
+					if (data.includes(props.book.idBook)) {
+						setIsFavoriteBook(true);
+					}
+				})
+				.catch((error) => {
+					console.log(error);
+				});
+		}
+	}, []);
     useEffect(() => {
         GetAllImage(props.book.idBook)
             .then((ImageData) => {
@@ -115,6 +135,42 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
         toast.success("Thêm vào giỏ hàng thành công");
         setTotalCart(cartList.length);
     };
+    // Xử lý chức năng yêu sách
+	const handleFavoriteBook = async (newBook: BookModel) => {
+		if (!isToken()) {
+			toast.info("Bạn phải đăng nhập để sử dụng chức năng này");
+			navigation("/login");
+			return;
+		}
+		if (!isFavoriteBook) {
+			const token = localStorage.getItem("token");
+			fetch( `http://localhost:8080/favorite-book/add-favorite`, {
+				method: "POST",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					idBook: props.book.idBook,
+					idUser: getIdUserByToken(),
+				}),
+			}).catch((err) => console.log(err));
+		} else {
+			const token = localStorage.getItem("token");
+			fetch( `http://localhost:8080/favorite-book/delete-book`, {
+				method: "DELETE",
+				headers: {
+					Authorization: `Bearer ${token}`,
+					"content-type": "application/json",
+				},
+				body: JSON.stringify({
+					idBook: props.book.idBook,
+					idUser: getIdUserByToken(),
+				}),
+			}).catch((err) => console.log(err));
+		}
+		setIsFavoriteBook(!isFavoriteBook);
+	};
     return (
         <div className="col-md-6 col-lg-3 mt-3">
             <div className="card position-relative">
@@ -185,10 +241,10 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
                             <Tooltip title="Yêu thích">
                                 <IconButton
                                     size="small"
-                                    // color={isFavoriteBook ? "error" : "default"}
-                                    // onClick={() => {
-                                    // 	handleFavoriteBook(book);
-                                    // }}
+                                    color={isFavoriteBook ? "error" : "default"}
+                                    onClick={() => {
+                                    	handleFavoriteBook(props.book);
+                                    }}
                                 >
                                     <FavoriteIcon />
                                 </IconButton>

@@ -16,6 +16,7 @@ class BookModel {
     relatedImg?: string[];
     idGenres?: number[];
     genresList?: CategoryModel[];
+    isFavorited?: boolean;
     constructor(
         idBook: number,
         nameBook: string, //CO the null

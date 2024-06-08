@@ -29,6 +29,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import MyFavoriteBooksPage from "./layout/page/MyFavoritePage";
 import { FeedbackCustomerPage } from "./layout/page/FeedBackCustomerPage";
+import FeedbackPage from "./admin/FeedbackManagement";
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -163,6 +164,7 @@ const MyRoutes = () => {
                                         <UserManagementPage></UserManagementPage>
                                     }
                                 ></Route>
+                                <Route path="/admin/feedback" element={<FeedbackPage></FeedbackPage>}> </Route>
                             </Routes>
                         </div>
                     </div>

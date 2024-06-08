@@ -47,7 +47,6 @@ const LoginPage: React.FC = () => {
             })
             .then( async (data) => {
                 const { jwt } = data;
-                console.log(jwt);
                 const decodedToken = jwtDecode(jwt) as JwtPayLoad;
                 if (decodedToken.enabled === false) {
                     toast.warning(

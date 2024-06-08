@@ -4,24 +4,24 @@ import CartItemModel from "../../models/CartItemModel";
 
 interface CartPageProps {
     // cartList: CartItemModel[];
-    setTotalCart: any;
+    // setTotalCart: any;
 }
 
 
 const CartPage: React.FC<CartPageProps> = (props) => {
-	const [cartList, setCartList] = useState<CartItemModel[]>([]);
+	// const [cartList, setCartList] = useState<CartItemModel[]>([]);
 
-	useEffect(() => {
-		const cartData: string | null = localStorage.getItem("cart");
-		const cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
-		setCartList(cart);
-	}, [cartList]);
+	// useEffect(() => {
+	// 	const cartData: string | null = localStorage.getItem("cart");
+	// 	const cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
+	// 	setCartList(cart);
+	// }, [cartList]);
 	return (
 		
 		<BookCartList
-			cartList={cartList}
-			setCartList={setCartList}
-			setTotalCart={props.setTotalCart}
+			// cartList={cartList}
+			// setCartList={setCartList}
+			// setTotalCart={props.setTotalCart}
 		/>
 	);
 };

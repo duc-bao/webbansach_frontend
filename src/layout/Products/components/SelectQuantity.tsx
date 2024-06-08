@@ -1,6 +1,8 @@
 import { Button, Icon } from "@mui/material";
 import { useState } from "react";
 import BookModel from "../../../models/BookModel";
+import CartItemModel from "../../../models/CartItemModel";
+import { isToken } from "../../utils/JwtService";
 
 interface SelectQuantityProps {
     max: number | undefined;
@@ -12,38 +14,82 @@ interface SelectQuantityProps {
    
 }
 const SelectQuantity: React.FC<SelectQuantityProps> = (props) => {
-    const [quantity, setQuantity] = useState(1);
+   // Xử lý khi thay đổi input quantity bằng bàn phím
+	const handleQuantity = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const newQuantity = parseInt(e.target.value);
+		if (
+			!isNaN(newQuantity) &&
+			newQuantity >= 1 &&
+			newQuantity <= (props.max ? props.max : 1)
+		) {
+			props.setQuantity(newQuantity);
+			const cartData: string | null = localStorage.getItem("cart");
+			const cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
+			// cái isExistBook này sẽ tham chiếu đến cái cart ở trên, nên khi update thì cart nó cũng update theo
+			let isExistBook = cart.find(
+				(cartItem) => cartItem.book.idBook === props.book?.idBook
+			);
+			// Thêm 1 sản phẩm vào giỏ hàng
+			if (isExistBook) {
+				// nếu có rồi thì sẽ gán là số lượng mới
+				isExistBook.quantity = newQuantity;
 
-    const reduce = () => {
-        setQuantity(quantity - 1);
-    };
-    const add = () => {
-       
-        setQuantity(quantity + 1);
-    };
+				// Cập nhật trong db
+				if (isToken()) {
+					const token = localStorage.getItem("token");
+					fetch(`http://localhost:8080/cart-item/update-cart`, {
+						method: "PUT",
+						headers: {
+							Authorization: `Bearer ${token}`,
+							"content-type": "application/json",
+						},
+						body: JSON.stringify({
+							idCart: isExistBook.idCart,
+							quantity: isExistBook.quantity,
+						}),
+					}).catch((err) => console.log(err));
+				}
+			}
+			// Cập nhật lại
+			localStorage.setItem("cart", JSON.stringify(cart));
+		}
+	};
     return (
-        <div className="wrapper-select-quantity d-flex align-items-center rounded">
-            <Button size="small" onClick={() => reduce()}>
-                <Icon>remove</Icon>
-            </Button>
-            <input
-                type="number"
-                className="inp-number p-0 m-0"
-                value={quantity}
-				onChange={(e) => {
-                    const value = parseInt(e.target.value);
-                    if (!isNaN(value)) {
-                        setQuantity(value);
-                        
-                    }
-                }}
-                min={1}
-                max={99}
-            />
-            <Button size="small" onClick={() => add()}>
-                <Icon>add</Icon>
-            </Button>
-        </div>
+        <div
+			className='wrapper-select-quantity d-flex align-items-center rounded'
+			style={{ width: "110px" }}
+		>
+			<button
+				type='button'
+				className='d-flex align-items-center justify-content-center'
+				onClick={() => props.reduce()}
+				style={{
+					backgroundColor: "transparent",
+					borderColor: "transparent",
+				}}
+			>
+				<Icon>remove</Icon>
+			</button>
+			<input
+				type='number'
+				className='inp-number p-0 m-0'
+				value={props.quantity}
+				onChange={handleQuantity}
+				min={1}
+				max={props.max}
+			/>
+			<button
+				type='button'
+				className='d-flex align-items-center justify-content-center'
+				onClick={() => props.add()}
+				style={{
+					backgroundColor: "transparent",
+					borderColor: "transparent",
+				}}
+			>
+				<Icon>add</Icon>
+			</button>
+		</div>
     );
 };
 

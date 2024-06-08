@@ -1,19 +1,18 @@
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import { IconButton } from "@mui/material";
+import Tooltip from "@mui/material/Tooltip";
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
+import { GetAllImage } from "../../../api/ImageAPI";
 import BookModel from "../../../models/BookModel";
 import ImageModel from "../../../models/ImageModel";
-import Tooltip from "@mui/material/Tooltip";
-import { IconButton } from "@mui/material";
-import { GetAllImage } from "../../../api/ImageAPI";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import TextEllipsis from "./text-elip/TextElipsis";
-import { Link } from "react-router-dom";
-import CartItemModel from "../../../models/CartItemModel";
 import { useCartItem } from "../../utils/CartItemContext";
-import { toast } from "react-toastify";
+import { getIdUserByToken, isToken } from "../../utils/JwtService";
+import TextEllipsis from "./text-elip/TextElipsis";
 
 interface BookPropInterface {
     book: BookModel;
-    setTotalCart: any;
 }
 const BookProps: React.FC<BookPropInterface> = (props) => {
 	// xử dụng API provider để thay thế cách truyền thủ công
@@ -50,77 +49,69 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
 
 	// Xử lí thêm vào giỏ hàng
     const handleAddProduct = async (newBook: BookModel) => {
-        // cái isExistBook này sẽ tham chiếu đến cái cart ở trên, nên khi update thì cart nó cũng update theo
         let isExistBook = cartList.find(
             (cartItem) => cartItem.book.idBook === newBook.idBook
         );
-        // Thêm 1 sản phẩm vào giỏ hàng
+
         if (isExistBook) {
-            // nếu có rồi thì sẽ tăng số lượng
             isExistBook.quantity += quantity;
 
-            // Lưu vào db
-            // if (isToken()) {
-            //     const request = {
-            //         idCart: isExistBook.idCart,
-            //         quantity: isExistBook.quantity,
-            //     };
-            //     const token = localStorage.getItem("token");
-            //     fetch(endpointBE + `/cart-item/update-item`, {
-            //         method: "PUT",
-            //         headers: {
-            //             Authorization: `Bearer ${token}`,
-            //             "content-type": "application/json",
-            //         },
-            //         body: JSON.stringify(request),
-            //     }).catch((err) => console.log(err));
-            // }
+            if (isToken()) {
+                const request = {
+                    idCart: isExistBook.idCart,
+                    quantity: isExistBook.quantity,
+                };
+                const token = localStorage.getItem("token");
+                fetch(`http://localhost:8080/cart-item/update-cart`, {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify(request),
+                }).catch((err) => console.log(err));
+            }
         } else {
-            // Lưu vào db
-            // if (isToken()) {
-            //     try {
-            //         const request = [
-            //             {
-            //                 quantity: quantity,
-            //                 book: newBook,
-            //                 idUser: getIdUserByToken(),
-            //             },
-            //         ];
-            //         const token = localStorage.getItem("token");
-            //         const response = await fetch(
-            //             endpointBE + "/cart-item/add-item",
-            //             {
-            //                 method: "POST",
-            //                 headers: {
-            //                     Authorization: `Bearer ${token}`,
-            //                     "content-type": "application/json",
-            //                 },
-            //                 body: JSON.stringify(request),
-            //             }
-            //         );
-            //         if (response.ok) {
-            //             const idCart = await response.json();
-            //             cartList.push({
-            //                 idCart: idCart,
-            //                 quantity: quantity,
-            //                 book: newBook,
-            //             });
-            //         }
-            //     } catch (error) {
-            //         console.log(error);
-            //     }
-            // } else {
-            //
-            //     });
-            // }
-            cartList.push({
-                quantity: quantity,
-                book: newBook,
-            });
+            if (isToken()) {
+                try {
+                    const request = [
+                        {
+                            quantity: quantity,
+                            book: newBook,
+                            idUser: getIdUserByToken(),
+                        },
+                    ];
+                    const token = localStorage.getItem("token");
+                    const response = await fetch(
+                        "http://localhost:8080/cart-item/add-cart",
+                        {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "content-type": "application/json",
+                            },
+                            body: JSON.stringify(request),
+                        }
+                    );
+                    if (response.ok) {
+                        const idCart = await response.json();
+                        cartList.push({
+                            idCart: idCart,
+                            quantity: quantity,
+                            book: newBook,
+                        });
+                    }
+                } catch (error) {
+                    console.log(error); 
+                }
+            } else {
+                cartList.push({
+                    quantity: quantity,
+                    book: newBook,
+                });
+            }
         }
-        // Lưu vào localStorage
         localStorage.setItem("cart", JSON.stringify(cartList));
-        // Thông báo toast
         toast.success("Thêm vào giỏ hàng thành công");
         setTotalCart(cartList.length);
     };

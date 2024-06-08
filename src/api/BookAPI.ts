@@ -48,7 +48,10 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
 }
 
 export async function getAllBook(size?: number, page?: number): Promise<resultInterface> {
-    const url: string = `http://localhost:8080/books?sort=idBook,desc&size=12&page=${page}`;
+    if (!size) {
+        size = 12;
+     }
+    const url: string = `http://localhost:8080/books?sort=idBook,desc&size=${size}&page=${page}`;
     return getBook(url);
 }
 export async function get3Book(): Promise<resultInterface> {
@@ -93,7 +96,7 @@ export async function searchBook(
     // Nếu có key search và không có lọc thể loại
 
     if (keySearch !== "") {
-        url = `http://localhost:8080/books/search/findByNameContaining?nameBook=${keySearch}&${optionsShow}&${filterEndpoint}`;
+        url = `http://localhost:8080/books/search/findByNameBookContaining?nameBook=${keySearch}&${optionsShow}&${filterEndpoint}`;
     }
     // Nếu idGenre không undifined
     if (idGenre !== undefined) {
@@ -136,7 +139,7 @@ export async function getBookId(idBook: number): Promise<BookModel | null> {
     try {
         // Gọi phương thức request()
         const request = await my_request(url);
-        console.log(request);
+       
         // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
         if (request) {
             bookResponse = request;

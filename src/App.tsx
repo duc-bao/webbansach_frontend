@@ -93,7 +93,7 @@ const MyRoutes = () => {
                     <Route
                         path="/cart"
                         element={
-                            <CartPage setTotalCart={setTotalCart}></CartPage>
+                            <CartPage ></CartPage>
                         }
                     ></Route>
                     <Route

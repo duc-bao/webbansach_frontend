@@ -77,7 +77,6 @@ const HotBookList: React.FC<HotBookListInterface> = (props) => {
 					<BookProps
 					key={book.idBook}
 					book={book}
-					setTotalCart={props.setTotalCart}
 				/>
 				))}
 			</div>

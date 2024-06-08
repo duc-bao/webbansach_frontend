@@ -4,6 +4,7 @@ import Carousel from "./components/Carousel";
 import BookList from "../Products/BookList";
 import HotBookList from "../Products/BookHot";
 import { useParams } from "react-router-dom";
+import DanhSachSanPham from "../Products/BookList";
 interface HomePageProps {
     keywordSearch: string;
     totalCart: any;
@@ -40,12 +41,7 @@ const HomePage: React.FC<HomePageProps> = (props) => {
                 setTotalCart={props.setTotalCart}
                 totalCart={props.totalCart}
             />
-            <BookList
-                setTotalCart={props.setTotalCart}
-                totalCart={props.totalCart}
-                keywordSearch={props.keywordSearch}
-                idGenre={idGenreNumber}
-            ></BookList>
+            <DanhSachSanPham size={12} />
         </>
     );
 };

@@ -61,8 +61,6 @@ const FilterPage: React.FC<FilterPageProps> = (props) => {
 				keySearch={keySearch}
 				idGenre={idGenreNumber ? idGenreNumber : idGenre}
 				filter={filter}
-                keywordSearch={keySearch}
-				setTotalCart={props.setTotalCart}
 			/>
 		</>
 	);

@@ -7,30 +7,26 @@ import { BookCartProps } from "./components/BookCartProps";
 import CartItemModel from "../../models/CartItemModel";
 import { CheckoutPage } from "../page/CheckoutPage";
 import { isToken } from "../utils/JwtService";
+import useScrollToTop from "../hooks/ScrollToTop";
 
 interface BookCartListInterface {
-    cartList: CartItemModel[];
-    setCartList: any;
-    setTotalCart: any;
+    // cartList: CartItemModel[];
+    // setCartList: any;
+    // setTotalCart: any;
 }
 
 export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
+    useScrollToTop();
     const navigation = useNavigate();
     const { setTotalCart, cartList, setCartList } = useCartItem();
     const [totalPriceProduct, setTotalPriceProduct] = useState(0);
     useEffect(() => {
-        const total = cartList.reduce((totalPrice, cartItem) => {
-            if (cartItem.book && cartItem.book.sellPrice) {
-                // Nếu cả hai tồn tại, thực hiện tính toán
-                return totalPrice + cartItem.quantity * cartItem.book.sellPrice;
-            } else {
-                // Nếu một trong hai không tồn tại, trả về giá trị hiện tại mà không thêm gì vào
-                return totalPrice;
-            }
-        }, 0);
-        setTotalPriceProduct(total);
-        setTotalCart(cartList.length);
-    }, [cartList, setTotalCart]); // Khúc này đang bị overloading
+		const total = cartList.reduce((totalPrice, cartItem) => {
+			return totalPrice + cartItem.quantity * cartItem.book.sellPrice;
+		}, 0);
+		setTotalPriceProduct(total);
+		setTotalCart(cartList.length);
+	}, [cartList, setTotalCart]); // Khúc này đang bị overloading
     function handleRemoveBook(idBook: number) {
         const newCartList = cartList.filter(
             (cartItem) => cartItem.book.idBook !== idBook
@@ -41,6 +37,7 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
         toast.success("Xoá sản phẩm thành công");
     }
     const [isCheckout, setIsCheckout] = useState(false);
+    // console.log(cartList);
     return (
         <>
 			{!isCheckout ? (
@@ -48,7 +45,7 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
             {cartList.length === 0 && (
                 <div className="d-flex align-items-center justify-content-center flex-column position-relative">
                     <img
-                        src="https://newnet.vn/themes/newnet/assets/img/empty-cart.png"
+                        src="https://addons.prestashop.com/1535723-pbig/empty-cart-button.jpg"
                         alt=""
                         width="63%"
                     />
@@ -89,7 +86,7 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
                                     <BookCartProps
                                     cartItem={cartItem}
                                     handleRemoveBook={handleRemoveBook}
-                                    setTotalCart={props.setTotalCart}
+                                    // setTotalCart={props.setTotalCart}
                                     key={cartItem.book.idBook}
                                     />
                                 );

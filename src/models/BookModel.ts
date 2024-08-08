@@ -12,7 +12,7 @@ class BookModel {
     avgRating?: number;
     soldQuantity?: number;
     thumbnail?: string;
-    discountPercent?: number;
+    discountPercent?: number;   
     relatedImg?: string[];
     idGenres?: number[];
     genresList?: CategoryModel[];

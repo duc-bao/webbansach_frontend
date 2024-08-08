@@ -30,6 +30,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import MyFavoriteBooksPage from "./layout/page/MyFavoritePage";
 import { FeedbackCustomerPage } from "./layout/page/FeedBackCustomerPage";
 import FeedbackPage from "./admin/FeedbackManagement";
+import CheckoutStatus from "./layout/page/CheckoutStatus";
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -114,6 +115,10 @@ const MyRoutes = () => {
                         path="error-403"
                         element={<Error403Page></Error403Page>}
                     ></Route>
+                    <Route
+							path='/check-out/status'
+							element={<CheckoutStatus />}
+						/>
                     <Route
                         path="error-404"
                         element={<Error404Page></Error404Page>}

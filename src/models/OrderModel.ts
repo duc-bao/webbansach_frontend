@@ -3,7 +3,7 @@ import UserModel from "./UserModel"
 
 class OrderModel{
     idOrder: number
-    dateOrder: Date
+    dateCreated: Date
     purchaseAddress?: string
     deliveryAddress: string
     totalPriceProduct: number
@@ -31,7 +31,7 @@ class OrderModel{
         this.idOrder = idOrder;
         this.deliveryAddress = deliveryAddress;
         this.totalPrice = totalPrice;
-        this.dateOrder = dateOrder;
+        this.dateCreated = dateOrder;
         this.status = status;
         this.feeDelivery = feeDelivery;
         this.feePayment = feePayment;

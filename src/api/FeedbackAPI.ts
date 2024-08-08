@@ -1,5 +1,5 @@
 import FeedbackModel from "../models/FeedbackModel";
-import { my_request } from "./Request";
+import { my_request, requestAdmin } from "./Request";
 
 export async function getAllFeedBack() : Promise<FeedbackModel[]> {
     const url = `http://localhost:8080/feedbacks`;
@@ -25,3 +25,15 @@ export async function getAllFeedBack() : Promise<FeedbackModel[]> {
     }
 
 }
+export async function getTotalNumberOfFeedbacks(): Promise<number> {
+    const endpoint =  "http://localhost:8080/feedbacks/search/countBy";
+    try {
+       const response = await requestAdmin(endpoint);
+       if (response) {
+          return response;
+       }
+    } catch (error) {
+       throw new Error("Lỗi không gọi được endpoint lấy tổng feedback\n" + error);
+    }
+    return 0;
+ }

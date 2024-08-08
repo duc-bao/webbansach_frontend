@@ -1,6 +1,6 @@
 import React from "react";
 import BookModel from "../models/BookModel";
-import { my_request } from "./Request";
+import { my_request, requestAdmin } from "./Request";
 import { GetAllImage } from "./ImageAPI";
 import { getAllGenre, getGenreByID } from "./GenreAPI";
 import CategoryModel from "../models/CategoryModel";
@@ -223,3 +223,38 @@ export async function getBookByIdCartItem(idCart: number): Promise<BookModel | n
         return null;    
     }
 }
+export async function getTotalNumberOfBooks(): Promise<number> {
+    const endpoint =  `http://localhost:8080/book/get-total`;
+    try {
+       // Gọi phương thức request()
+       const response = await requestAdmin(endpoint);
+       // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
+       if (response) {
+          // Trả về số lượng cuốn sách
+          return response;
+       }
+    } catch (error) {
+       throw new Error("Lỗi không gọi được endpoint lấy tổng cuốn sách\n" + error);
+    }
+    return 0;
+ }
+
+ export async function get3BestSellerBooks(): Promise<BookModel[]> {
+    const endpoint: string =  "http://localhost:8080/books?sort=soldQuantity,desc&size=3";
+    let bookList = await getBook(endpoint);
+ 
+    // Use Promise.all to wait for all promises in the map to resolve
+    let newBookList = await Promise.all(bookList.result.map(async (book: any) => {
+       // Trả về quyển sách
+       const responseImg = await GetAllImage(book.idBook);
+       const thumbnail = responseImg.find(image => image.icon);
+ 
+       return {
+          ...book,
+          thumbnail: thumbnail ? thumbnail.linkImg : null,
+       };
+    }));
+ 
+    return newBookList;
+ }
+ 

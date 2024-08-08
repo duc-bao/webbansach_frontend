@@ -37,7 +37,7 @@ export const OrderDetail: React.FC<OrderDetailProps> = (props) => {
 					<p>
 						Ngày mua:
 						<strong className='ms-2'>
-							{format(new Date(props.order.dateOrder), "dd/MM/yyyy")}
+							{format(new Date(props.order.dateCreated), "dd/MM/yyyy")}
 						</strong>
 					</p>
 					<p>

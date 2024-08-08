@@ -20,26 +20,35 @@ const CheckoutStatus: React.FC = () => {
 	const [isSuccess, setIsSuccess] = useState(false);
 
 	useEffect(() => {
-		const searchParams = new URLSearchParams(location.search);
-		const vnpResponseCode = searchParams.get("vnp_ResponseCode");
-
-		if (vnpResponseCode === "00") {
-			setIsSuccess(true);
-		} else {
-			// const token = localStorage.getItem("token");
-			// fetch(endpointBE + "/order/cancel-order", {
-			// 	method: "PUT",
-			// 	headers: {
-			// 		Authorization: `Bearer ${token}`,
-			// 		"content-type": "application/json",
-			// 	},
-			// 	body: JSON.stringify({
-			// 		idUser: getIdUserByToken(),
-			// 	}),
-			// }).catch((error) => {
-			// 	console.log(error);
-			// });
-		}
+		
+		const token = localStorage.getItem("token");
+		fetch("http://localhost:8080/vnpay/payment/infor", {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json"
+            }
+        }).then(response => response.json())
+		.then(data => {
+            if (data.status === "success") {
+                console.log(data.status)
+                setIsSuccess(true);
+            } else if(data.status === "failed") {
+                fetch("http://localhost:8080/order/cancel-order", {
+                    method: "PUT",
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        "content-type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        idUser: getIdUserByToken(),
+                    }),
+                }).catch((error) => {
+                    console.log(error);
+                });
+            }
+        })
+        .catch(error => console.log(error));
 	}, [location.search]);
 
 	return <>{isSuccess ? <CheckoutSuccess /> : <CheckoutFail />}</>;

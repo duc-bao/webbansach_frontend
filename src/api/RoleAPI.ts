@@ -13,7 +13,7 @@ export async function getAllRole():Promise<RoleModel[]> {
 
 export async function getRoleByIdUser(idUser: any): Promise<RoleModel> {
     const endpoint = `http://localhost:8080/users/${idUser}/roleList`;
-    // Gọi phương thức request()
+    // Gọi phương thức request() 
     const response = await my_request(endpoint);
  
     const rolesList: RoleModel[] = response._embedded.roles.map((role: any) => ({

@@ -37,7 +37,7 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
         toast.success("Xoá sản phẩm thành công");
     }
     const [isCheckout, setIsCheckout] = useState(false);
-    // console.log(cartList);
+     console.log(cartList);
     return (
         <>
 			{!isCheckout ? (
@@ -84,7 +84,7 @@ export const BookCartList: React.FC<BookCartListInterface> = (props)=> {
                             {cartList.map((cartItem) => {
                                 return (
                                     <BookCartProps
-                                    cartItem={cartItem}
+                                    cartItem={cartItem} 
                                     handleRemoveBook={handleRemoveBook}
                                     // setTotalCart={props.setTotalCart}
                                     key={cartItem.book.idBook}

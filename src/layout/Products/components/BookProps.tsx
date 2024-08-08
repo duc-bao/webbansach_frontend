@@ -32,7 +32,6 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
 			)
 				.then((response) => response.json())
 				.then((data) => {
-                    console.log(data);
 					if (data.includes(props.book.idBook)) {
 						setIsFavoriteBook(true);
 					}
@@ -69,6 +68,8 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
 
 	// Xử lí thêm vào giỏ hàng
     const handleAddProduct = async (newBook: BookModel) => {
+        console.log(newBook.idBook);
+        console.log(cartList);
         let isExistBook = cartList.find(
             (cartItem) => cartItem.book.idBook === newBook.idBook
         );

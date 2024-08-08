@@ -46,8 +46,12 @@ const LoginPage: React.FC = () => {
                 }
             })
             .then( async (data) => {
-                const { jwt } = data;
+                console.log(data);
+                // const { jwt } = data.token;
+                const { token: jwt, refreshToken } = data;
+                console.log("Type of JWT Token:", typeof jwt);
                 const decodedToken = jwtDecode(jwt) as JwtPayLoad;
+                // const {refreshToken} = data.refreshToken;
                 if (decodedToken.enabled === false) {
                     toast.warning(
                         "Tài khoản của bạn  chưa kích hoạt vui lòng kích hoạt trước khi sử dụng"
@@ -57,6 +61,7 @@ const LoginPage: React.FC = () => {
                 toast.success("Đăng nhập thành công");
                 
                 localStorage.setItem("token", jwt);
+                localStorage.setItem("refreshToken", refreshToken);
                 const cartData: string | null = localStorage.getItem("cart");
 				let cart: CartItemModel[] = cartData ? JSON.parse(cartData) : [];
                 // Khi đăng nhập thành công mà trước đó đã thêm sản phẩm vào giỏ hàng thì các sản phẩm đó sẽ được thêm vào db

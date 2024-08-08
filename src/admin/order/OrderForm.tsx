@@ -29,7 +29,7 @@ export const OrderForm: React.FC<OrderFormProps> = (props) => {
         totalPriceProduct: 0,
         feeDelivery: 0,
         feePayment: 0,
-        dateOrder: new Date(),
+        dateCreated: new Date(),
         status: "",
     });
     // Step

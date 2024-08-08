@@ -24,7 +24,7 @@ const HotBookList: React.FC<HotBookListInterface> = (props) => {
                 setLoadData(false);
             }
         );
-    });
+    },[]);
     if(loadData){
         return (
 			<div className='container-book container mb-5 py-5 px-5 bg-light'>

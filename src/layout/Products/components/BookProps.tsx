@@ -79,11 +79,11 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
 
             if (isToken()) {
                 const request = {
-                    idCart: isExistBook.idCart,
                     quantity: isExistBook.quantity,
+                    idBook: newBook.idBook
                 };
                 const token = localStorage.getItem("token");
-                fetch(`http://localhost:8080/cart-item/update-cart`, {
+                fetch(`http://localhost:8080/cart-item/update/${isExistBook.idCart}/${getIdUserByToken()}`, {
                     method: "PUT",
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -98,13 +98,12 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
                     const request = [
                         {
                             quantity: quantity,
-                            book: newBook,
-                            idUser: getIdUserByToken(),
+                            idBook: newBook.idBook,
                         },
                     ];
                     const token = localStorage.getItem("token");
                     const response = await fetch(
-                        "http://localhost:8080/cart-item/add-cart",
+                        `http://localhost:8080/cart-item/add/${getIdUserByToken()}`,
                         {
                             method: "POST",
                             headers: {
@@ -114,14 +113,18 @@ const BookProps: React.FC<BookPropInterface> = (props) => {
                             body: JSON.stringify(request),
                         }
                     );
-                    if (response.ok) {
-                        const idCart = await response.json();
-                        cartList.push({
-                            idCart: idCart,
-                            quantity: quantity,
-                            book: newBook,
-                        });
-                    }
+                    console.log(111);
+                        if (response.ok) {
+                            const responseData = await response.json();
+                            console.log(responseData);
+                            const idCart = responseData.idCart;
+                            console.log(idCart);
+                            cartList.push({
+                                idCart: idCart,
+                                quantity: quantity,
+                                book: newBook,
+                            });
+                        }
                 } catch (error) {
                     console.log(error); 
                 }

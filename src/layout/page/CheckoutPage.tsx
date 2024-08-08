@@ -131,7 +131,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = (props) => {
                 setTotalCart(0);
             }
             toast.success("Thanh toán thành công");
-            setIsSuccessPayment(true);
+            
         }).catch((error) => {
             console.log(error);
             toast.error("Thanh toán thất bại");

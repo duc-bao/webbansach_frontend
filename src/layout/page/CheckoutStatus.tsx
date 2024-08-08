@@ -20,38 +20,60 @@ const CheckoutStatus: React.FC = () => {
 	const [isSuccess, setIsSuccess] = useState(false);
 
 	useEffect(() => {
-		
-		const token = localStorage.getItem("token");
-		fetch("http://localhost:8080/vnpay/payment/infor", {
-            method: "GET",
-            headers: {
-                Authorization: `Bearer ${token}`,
-                "Content-Type": "application/json"
-            }
-        }).then(response => response.json())
-		.then(data => {
-            if (data.status === "success") {
-                console.log(data.status)
-                setIsSuccess(true);
-            } else if(data.status === "failed") {
-                fetch("http://localhost:8080/order/cancel-order", {
-                    method: "PUT",
+        const fetchData = async () => {
+            const token = localStorage.getItem("token");
+            try {
+                const response = await fetch("http://localhost:8080/vnpay/payment_info", {
+                    method: "POST",
                     headers: {
                         Authorization: `Bearer ${token}`,
-                        "content-type": "application/json",
+                        "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({
-                        idUser: getIdUserByToken(),
-                    }),
-                }).catch((error) => {
-                    console.log(error);
+                    body: JSON.stringify(parseURLParams(location.search)),
                 });
+                const data = await response.json();
+                console.log(location.search);
+                if (data.status === "success") {
+                    setIsSuccess(true);
+                } else if (data.status === "failed") {
+                    await fetch("http://localhost:8080/order/cancel-order", {
+                        method: "PUT",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            idUser: getIdUserByToken(),
+                        }),
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching data:", error);
             }
-        })
-        .catch(error => console.log(error));
-	}, [location.search]);
+        };
+    
+        fetchData();
+    }, [location.search]);
 
 	return <>{isSuccess ? <CheckoutSuccess /> : <CheckoutFail />}</>;
 };
+    function parseURLParams(search: string) {
+        const params = new URLSearchParams(search);
+        return {
+        vnp_Amount: params.get("vnp_Amount"),
+        vnp_BankCode: params.get("vnp_BankCode"),
+        vnp_BankTranNo: params.get("vnp_BankTranNo"),
+        vnp_CardType: params.get("vnp_CardType"),
+        vnp_OrderInfo: params.get("vnp_OrderInfo"),
+        vnp_PayDate: params.get("vnp_PayDate"),
+        vnp_ResponseCode: params.get("vnp_ResponseCode"),
+        vnp_TmnCode: params.get("vnp_TmnCode"),
+        vnp_TransactionNo: params.get("vnp_TransactionNo"),
+        vnp_TransactionStatus: params.get("vnp_TransactionStatus"),
+        vnp_TxnRef: params.get("vnp_TxnRef"),
+        vnp_SecureHash: params.get("vnp_SecureHash"),
+        };
+    }
 
 export default CheckoutStatus;
+

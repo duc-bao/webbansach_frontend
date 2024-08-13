@@ -10,7 +10,8 @@ import { toast } from "react-toastify";
 import CartItemModel from "../../models/CartItemModel";
 import { getCartAllByIdUser } from "../../api/CartAPI";
 import { useCartItem } from "../utils/CartItemContext";
-
+import GoogleIcon from "@mui/icons-material/Google";
+import { getIdUserByToken } from "../utils/JwtService";
 const LoginPage: React.FC = () => {
     const [username, setUserName] = useState("");
     const [password, setPassword] = useState("");
@@ -18,11 +19,33 @@ const LoginPage: React.FC = () => {
     const navigation = useNavigate();
     const { setTotalCart, setCartList } = useCartItem();
     const { isLoggedIn, setIsLoggedIn } = useAuth();
+    const navigate = useNavigate();
     useEffect(() => {
         if (isLoggedIn) {
             navigation("/");
         }
     });
+    const handleContinueWithGoogle = () => {
+        const callbackUrl = "http://localhost:3000/authenticate";
+        const authUrl = "https://accounts.google.com/o/oauth2/auth";
+        const googleClientId ="50673866762-9n4is19c1l77bor711pckk9185gpjed2.apps.googleusercontent.com";
+    
+        const targetUrl = `${authUrl}?redirect_uri=${encodeURIComponent(
+          callbackUrl
+        )}&response_type=code&client_id=${googleClientId}&scope=openid%20email%20profile`;
+    
+        console.log(targetUrl);
+    
+        window.location.href = targetUrl;
+      };
+    
+      useEffect(() => {
+        const accessToken = getIdUserByToken();
+    
+        if (accessToken) {
+          navigate("/");
+        }
+      }, [navigate]);
     // Biến thông báo lỗi
     const handleSubmit = (event: FormEvent) => {
         event.preventDefault();
@@ -170,6 +193,18 @@ const LoginPage: React.FC = () => {
                         Đăng nhập
                     </Button>
                 </div>
+                <Button
+                type="button"
+                variant="contained"
+                color="secondary"
+                size="large"
+                onClick={handleContinueWithGoogle}
+                fullWidth
+                sx={{ gap: "10px" }}
+              >
+                <GoogleIcon />
+                Continue with Google
+              </Button>
                 {error && <div style={{ color: "red" }}>{error}</div>}
             </form>
             <div className='d-flex justify-content-end mt-2 px-3'>

@@ -20,7 +20,9 @@ const DanhSachSanPham: React.FC<BookListProps> = (props) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
     const [loading, setLoading] = useState<boolean>(true);
-
+    console.log(props.keySearch);
+    console.log("idGenre:", props.idGenre);
+    console.log("filter:", props.filter);
     // Xử lý phân trang
     const handlePagination = (pageNumber: number) => {
         setCurrentPage(pageNumber);
@@ -33,36 +35,45 @@ const DanhSachSanPham: React.FC<BookListProps> = (props) => {
 		setTotalPagesTemp(totalPages);
 	}
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true);
-                let response;
-                if (
-                    (props.keySearch === "" &&
-                        props.idGenre === 0 &&
-                        props.filter === 0) ||
-                    props.keySearch === undefined
-                ) {
-                    response = await getAllBook(props.size, currentPage - 1);
-                } else {
-                    response = await searchBook(
-                        props.keySearch,
-                        props.idGenre,
-                        props.filter,
-                        props.size,
-                        currentPage - 1
-                    );
-                }
-                setBookList(response.result);
-                setTotalPages(response.totalPage);
-                setLoading(false);
-                setLoadData(false);
-            } catch (errors) {
-                setLoading(false);
-                setLoadData(false);
-            }
-        };
-        fetchData();
+        if (
+			(props.keySearch === "" &&
+				props.idGenre === 0 &&
+				props.filter === 0) ||
+			props.keySearch === undefined
+		) {
+			// currentPage - 1 vì trong endpoint trang đầu tiên sẽ là 0
+			getAllBook(props.size, currentPage - 1) // size là (tổng sản phẩm được hiện)
+				.then((response) => {
+					setBookList(response.result);
+					setTotalPages(response.totalPage);
+					setLoading(false);
+				})
+				.catch((error) => {
+					setLoading(false);
+					setLoadData(false);
+				});
+                console.log(1)
+		} else {
+			// Khi có các param lọc
+			searchBook(
+				props.keySearch,
+				props.idGenre,
+				props.filter,
+				props.size,
+				currentPage - 1
+			)
+				.then((response) => {
+					setBookList(response.result);
+					setTotalPages(response.totalPage);
+					setLoading(false);
+				})
+				.catch((error) => {
+					setLoading(false);
+					setLoadData(false);
+				});
+                console.log(2)
+		}
+
 	}, [currentPage, props.keySearch, props.idGenre, props.filter, props.size]);
     // console.log(bookList);
     if (loading) {

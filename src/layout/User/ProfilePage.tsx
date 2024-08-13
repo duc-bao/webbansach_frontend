@@ -244,7 +244,7 @@ export const ProfilePage: React.FC<ProfilePageProps> = (props) => {
 						<div className='d-flex align-items-center justify-content-center flex-column'>
 							<Avatar
 								style={{ fontSize: "50px" }}
-								alt={user.lastName.toUpperCase()}
+								alt={user.lastName? user.lastName.toUpperCase() : "Đức Bảo" }
 								src={previewAvatar}
 								sx={{ width: 100, height: 100 }}
 							/>

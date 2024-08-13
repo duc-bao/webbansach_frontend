@@ -31,6 +31,7 @@ import MyFavoriteBooksPage from "./layout/page/MyFavoritePage";
 import { FeedbackCustomerPage } from "./layout/page/FeedBackCustomerPage";
 import FeedbackPage from "./admin/FeedbackManagement";
 import CheckoutStatus from "./layout/page/CheckoutStatus";
+import Authenticate from "./layout/User/Authenticate";
 const MyRoutes = () => {
     const [reloadAvatar, setReloadAvatar] = useState(0);
     const [keywordSearch, setKeywordSearch] = useState("");
@@ -119,6 +120,10 @@ const MyRoutes = () => {
 							path='/check-out/status'
 							element={<CheckoutStatus />}
 						/>
+                    <Route 
+                            path="/authenticate"
+                            element={<Authenticate></Authenticate>}
+                        ></Route>
                     <Route
                         path="error-404"
                         element={<Error404Page></Error404Page>}

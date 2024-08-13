@@ -16,6 +16,7 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
     // Gọi phương thức request
     const result: BookModel[] = [];
     const response = await my_request(url);
+    console.log(response);
     const responseData = response._embedded.books;
     const totalPage: number = response.page.totalPages;
     const size: number = response.page.totalElements;
@@ -43,10 +44,47 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
             };
         })
     );
-
+    console.log(result);
     return { result: result, totalPage: totalPage, size: size };
 }
 
+export async function getBookSearch(endpoint: string):Promise<resultInterface> {
+    const url: string = endpoint;
+    // Gọi phương thức request
+    const result: BookModel[] = [];
+    const response = await my_request(url);
+    console.log(response);
+    const responseData = response.rows;
+    const totalPage: number = (response.total)/(response.size);
+    const size: number = response.total;
+    for (const key in responseData) {
+        result.push({
+            idBook: responseData[key].idBook,
+            nameBook: responseData[key].nameBook,
+            listPrice: responseData[key].listPrice,
+            sellPrice: responseData[key].sellPrice,
+            quantity: responseData[key].quantity,
+            description: responseData[key].description,
+            avgRating: responseData[key].avgRating,
+            soldQuantity: responseData[key].soldQuantity,
+            discountPercent: responseData[key].discountPercent,
+            author: responseData[key].author,
+        });
+    }
+    const bookList1 = await Promise.all(
+        result.map(async (book: BookModel) => {
+            const responseImg = await GetAllImage(book.idBook);
+            const thumbnail = responseImg.filter((image) => image.icon);
+            return {
+                ...book,
+                thumbnail: thumbnail[0].linkImg,
+            };
+        })
+    );
+    console.log(result);
+    return { result: result, totalPage: totalPage, size: size };
+    
+}
 export async function getAllBook(size?: number, page?: number): Promise<resultInterface> {
     if (!size) {
         size = 12;
@@ -79,8 +117,8 @@ export async function searchBook(
     if (keySearch) {
         keySearch = keySearch.trim();
     }
-    const optionsShow = `size=${size}&page=${page}`;
-    let url: string = `http://localhost:8080/books?${optionsShow}`;
+    const optionsShow = `pageSize=${size}&pageNo=${page}`;
+    let url: string = `http://localhost:8080/book/search-elk?${optionsShow}`;
     let filterEndpoint = "";
     if (filter === 1) {
         filterEndpoint = "sort=nameBook";
@@ -95,14 +133,15 @@ export async function searchBook(
     }
     // Nếu có key search và không có lọc thể loại
 
-    if (keySearch !== "") {
-        url = `http://localhost:8080/books/search/findByNameBookContaining?nameBook=${keySearch}&${optionsShow}&${filterEndpoint}`;
+    if (keySearch !== "" && filterEndpoint === "") {
+        url = `http://localhost:8080/book/search-elk?keyword=${keySearch}&${optionsShow}`;
     }
     // Nếu idGenre không undifined
     if (idGenre !== undefined) {
         // Nếu có không có key search và có lọc thể loại
         if (keySearch === "" && idGenre > 0) {
             url = `http://localhost:8080/books/search/findByCategoryList_IdCategory?idCategory=${idGenre}&${optionsShow}`;
+            
         }
         // Chỉ lọc filter
         if (
@@ -112,7 +151,7 @@ export async function searchBook(
             url = `http://localhost:8080/books?${optionsShow}&${filterEndpoint}`;
         }
     }
-    return getBook(url);
+    return getBookSearch(url);
 }
 
 //Lấy danh sách sách hot ra

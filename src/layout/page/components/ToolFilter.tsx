@@ -22,6 +22,9 @@ const ToolFilter: React.FC<ToolFilterProps> = (props) =>{
 	// Khi thay đổi value ở ô input thì sẽ tự động cập nhật lại component
     const onSetKeySearch = (e: ChangeEvent<HTMLInputElement>) => {
         setKeySearchTemp(e.target.value);
+		if (e.target.value.trim() === "") {
+			props.setKeySearch(e.target.value);
+		}
     };
 	// Khi nhấn vào nút search
     const handleSearch = () => {
@@ -153,7 +156,7 @@ const ToolFilter: React.FC<ToolFilterProps> = (props) =>{
 							<TextField
 								size='small'
 								id='outlined-search'
-								label='Tìm kiếm theo tên sách'
+								label='Tìm kiếm sách'
 								type='search'
 								value={keySearchTemp}
 								onChange={onSetKeySearch}

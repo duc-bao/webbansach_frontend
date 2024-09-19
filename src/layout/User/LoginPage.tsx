@@ -20,11 +20,6 @@ const LoginPage: React.FC = () => {
     const { setTotalCart, setCartList } = useCartItem();
     const { isLoggedIn, setIsLoggedIn } = useAuth();
     const navigate = useNavigate();
-    useEffect(() => {
-        if (isLoggedIn) {
-            navigation("/");
-        }
-    });
     const handleContinueWithGoogle = () => {
         const callbackUrl = "http://localhost:3000/authenticate";
         const authUrl = "https://accounts.google.com/o/oauth2/auth";

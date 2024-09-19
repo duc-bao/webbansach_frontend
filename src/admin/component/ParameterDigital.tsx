@@ -6,6 +6,7 @@ import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import ChatOutlinedIcon from "@mui/icons-material/ChatOutlined";
 import RateReviewOutlinedIcon from "@mui/icons-material/RateReviewOutlined";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 interface ParameterDigitalProps {
 	totalPrice: number;
@@ -24,6 +25,11 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 	totalNumberOfFeedbacks,
 	totalNumberOfReviews,
 }: ParameterDigitalProps) => {
+	const navigate = useNavigate();
+
+  const handleCardClick = (path: string) => {
+    navigate(path);
+  };
 	return (
 		<div className='conatiner p-4'>
 			<div className='shadow-4 rounded p-5 bg-light'>
@@ -35,6 +41,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#4db44da3",
 							}}
+							onClick={() => handleCardClick("/admin/order")}
 						>
 							<CardContent>
 								<Typography
@@ -81,6 +88,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#1976d2a3",
 							}}
+							onClick={() => handleCardClick("/admin/user")}
 						>
 							<CardContent>
 								<Typography
@@ -127,6 +135,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#757575a3",
 							}}
+							onClick={() => handleCardClick("/admin/order")}
 						>
 							<CardContent>
 								<Typography
@@ -173,6 +182,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#9c27b0a3",
 							}}
+							onClick={() => handleCardClick("/admin/book")}
 						>
 							<CardContent>
 								<Typography
@@ -219,6 +229,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#ed6c02a1",
 							}}
+							onClick={() => handleCardClick("/admin/feedback")}
 						>
 							<CardContent>
 								<Typography
@@ -265,6 +276,7 @@ export const ParameterDigital: React.FC<ParameterDigitalProps> = ({
 								borderRadius: 1,
 								backgroundColor: "#d32f2fa1",
 							}}
+							onClick={() => handleCardClick("/admin/book")}
 						>
 							<CardContent>
 								<Typography

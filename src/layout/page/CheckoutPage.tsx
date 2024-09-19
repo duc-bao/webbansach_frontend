@@ -45,7 +45,11 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = (props) => {
 		get1User(idUser)
 			.then((response) => {
 				setUser(response);
-				setFullName(response.firstName + " " + response.lastName);
+				setFullName(
+                    response.firstName && response.lastName
+                      ? `${response.firstName}  ${response.lastName}`
+                      : response.email
+                  );
 				setPhoneNumber(response.phoneNumber);
 				setDeliveryAddress(response.deliveryAdress);
 			})
@@ -53,6 +57,7 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = (props) => {
 				console.log(error);
 			});
 	}, []);
+
     async function handleSubmit(event: FormEvent<HTMLFormElement>) {
 		event.preventDefault();
 		const token = localStorage.getItem("token");
@@ -183,8 +188,10 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = (props) => {
                                         type='text'
                                         label='Email'
                                         value={user?.email}
-                                        disabled
                                         className='input-field'
+                                        InputLabelProps={{
+                                            shrink: true,
+                                          }}
                                     />
                                     <TextField
                                         required={true}

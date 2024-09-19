@@ -12,20 +12,25 @@ interface OrderDetailProps {
     type?: string;
 }
 export const OrderDetail: React.FC<OrderDetailProps> = (props) => {
+	console.log(props.order.status);
     return (
         <>
         <Chip
             label={props.order.status}
             sx={{ width: "auto-fit" }}
-            color={
-                props.order.status === "Thành công"
-                    ? "success"
-                    : props.order.status === "Đang xử lý"
-                    ? "info"
-                    : props.order.status === "Đang giao hàng"
-                    ? "warning"
-                    : "error"
-            }
+			color={
+				props.order.status === "Thành công"
+					? "success"
+					: props.order.status === "Đang xử lý"
+					? "info"
+					: props.order.status === "Đang giao hàng"
+					? "primary"
+					: props.order.status === "Đợi xác nhận"
+					? "warning"
+					: props.order.status === "Bị huỷ"
+					? "error"
+					: "default"  // Fallback color
+			}
             variant="outlined"
         />
         <div className='row'>

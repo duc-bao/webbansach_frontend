@@ -29,6 +29,7 @@ import {
 import { PieChart } from "@mui/x-charts";
 import Top3BestSeller from "./Top3BestSeller";
 import OrderModel from "../../models/OrderModel";
+import { useNavigate } from "react-router-dom";
 
 ChartJS.register(
 	CategoryScale,
@@ -272,12 +273,15 @@ export const Chart: React.FC<ChartProps> = (props) => {
 		setOrderFailure((orderFailureTotal / orderTotal) * 100);
 		setOrderDelivering((orderDeliveringTotal / orderTotal) * 100);
 	}, [props.orders]);
-
+	const navigate = useNavigate();
+	const handleChartClick = () => {
+		navigate("/admin/order");
+	  };
 	return (
 		<div className='conatiner p-4 '>
 			<div className='row'>
 				<div className='col-lg-6 col-md-12 col-sm-12'>
-					<div className='shadow-4 rounded py-5 mb-5 bg-light'>
+					<div className='shadow-4 rounded py-5 mb-5 bg-light'onClick={handleChartClick}> 
 						<h4 className='text-black text-center mb-3 pb-3'>
 							Biểu đồ thống kê trạng thái đơn hàng
 							<hr />

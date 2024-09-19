@@ -48,14 +48,20 @@ export async function getBook(endpoint: string): Promise<resultInterface> {
     return { result: result, totalPage: totalPage, size: size };
 }
 
-export async function getBookSearch(endpoint: string):Promise<resultInterface> {
+export async function getBookSearch(
+    endpoint: string
+): Promise<resultInterface> {
     const url: string = endpoint;
     // Gọi phương thức request
     const result: BookModel[] = [];
     const response = await my_request(url);
     console.log(response);
     const responseData = response.rows;
-    const totalPage: number = (response.total)/(response.size);
+    const totalItems = Number(response.total);
+    const itemsPerPage = Number(response.size);
+
+    // Calculate total pages and round up
+    const totalPage = Math.ceil(totalItems / itemsPerPage);
     const size: number = response.total;
     for (const key in responseData) {
         result.push({
@@ -81,14 +87,17 @@ export async function getBookSearch(endpoint: string):Promise<resultInterface> {
             };
         })
     );
+    console.log(totalPage);
     console.log(result);
     return { result: result, totalPage: totalPage, size: size };
-    
 }
-export async function getAllBook(size?: number, page?: number): Promise<resultInterface> {
+export async function getAllBook(
+    size?: number,
+    page?: number
+): Promise<resultInterface> {
     if (!size) {
         size = 12;
-     }
+    }
     const url: string = `http://localhost:8080/books?sort=idBook,desc&size=${size}&page=${page}`;
     return getBook(url);
 }
@@ -114,43 +123,78 @@ export async function searchBook(
     page?: number
 ): Promise<resultInterface> {
     // Nếu key search không undifined
+    let encodedKeySearch = "";
     if (keySearch) {
-        keySearch = keySearch.trim();
+        encodedKeySearch = encodeURIComponent(keySearch.trim());
     }
     const optionsShow = `pageSize=${size}&pageNo=${page}`;
     let url: string = `http://localhost:8080/book/search-elk?${optionsShow}`;
     let filterEndpoint = "";
     if (filter === 1) {
-        filterEndpoint = "sort=nameBook";
+        filterEndpoint = "nameBook";
     } else if (filter === 2) {
-        filterEndpoint = "sort=nameBook,desc";
+        filterEndpoint = "-nameBook";
     } else if (filter === 3) {
-        filterEndpoint = "sort=sellPrice";
+        filterEndpoint = "sellPrice";
     } else if (filter === 4) {
-        filterEndpoint = "sort=sellPrice,desc";
+        filterEndpoint = "-sellPrice";
     } else if (filter === 5) {
-        filterEndpoint = "sort=soldQuantity,desc";
+        filterEndpoint = "-soldQuantity";
+    }
+    let nameGender = "";
+    if (idGenre === 31) {
+        nameGender = "Truyện ngắn";
+    } else if (idGenre === 32) {
+        nameGender = "Trinh thám";
+    } else if (idGenre === 33) {
+        nameGender = "Kinh dị";
+    } else if (idGenre === 34) {
+        nameGender = "Ngôn tình";
+    } else if (idGenre === 35) {
+        nameGender = "Truyện cười";
+    } else if (idGenre === 36) {
+        nameGender = "Tuổi teen";
+    } else if (idGenre === 37) {
+        nameGender = "Giáo Trình";
+    }else if(idGenre === 38){
+        nameGender = "Tiểu Thuyết"
     }
     // Nếu có key search và không có lọc thể loại
 
-    if (keySearch !== "" && filterEndpoint === "") {
-        url = `http://localhost:8080/book/search-elk?keyword=${keySearch}&${optionsShow}`;
+    // if (keySearch !== "" && filterEndpoint === "") {
+    //     url = `http://localhost:8080/book/search-elk?keyword=${keySearch}&${optionsShow}`;
+    // }
+    // // Nếu idGenre không undifined
+    // if (idGenre !== undefined) {
+    //     // Nếu có không có key search và có lọc thể loại
+    //     if (keySearch === "" && idGenre > 0) {
+    //         url = `http://localhost:8080/book/search-elk?${optionsShow}&filter=categoryList.nameCategory(=)=${nameGender}`;
+
+    //     }
+    //     // Chỉ lọc filter
+    //     if (
+    //         keySearch === "" &&
+    //         (idGenre === 0 || typeof idGenre === "string")
+    //     ) {
+    //         url = `http://localhost:8080/book/search-elk?${optionsShow}&sortBy=${filterEndpoint}`;
+    //     }
+
+    // }
+    // Construct the query parameters based on the presence of keySearch, idGenre, and filter
+    let queryParams = "";
+
+    if (encodedKeySearch && nameGender) {
+        queryParams = `keyword=${encodedKeySearch}&filter=categoryList.nameCategory(=)=${nameGender}&sortBy=${filterEndpoint}`;
+    } else if (encodedKeySearch) {
+        queryParams = `keyword=${encodedKeySearch}&sortBy=${filterEndpoint}`;
+    } else if (nameGender) {
+        queryParams = `filter=categoryList.nameCategory(=)=${nameGender}&sortBy=${filterEndpoint}`;
+    } else {
+        queryParams = `sortBy=${filterEndpoint}`;
     }
-    // Nếu idGenre không undifined
-    if (idGenre !== undefined) {
-        // Nếu có không có key search và có lọc thể loại
-        if (keySearch === "" && idGenre > 0) {
-            url = `http://localhost:8080/books/search/findByCategoryList_IdCategory?idCategory=${idGenre}&${optionsShow}`;
-            
-        }
-        // Chỉ lọc filter
-        if (
-            keySearch === "" &&
-            (idGenre === 0 || typeof idGenre === "string")
-        ) {
-            url = `http://localhost:8080/books?${optionsShow}&${filterEndpoint}`;
-        }
-    }
+
+    // Combine base URL with query parameters
+    url = `http://localhost:8080/book/search-elk?${optionsShow}&${queryParams}`;
     return getBookSearch(url);
 }
 
@@ -178,7 +222,7 @@ export async function getBookId(idBook: number): Promise<BookModel | null> {
     try {
         // Gọi phương thức request()
         const request = await my_request(url);
-       
+
         // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
         if (request) {
             bookResponse = request;
@@ -217,83 +261,100 @@ export async function getBookByIdAllInformation(
         idGenres: [],
         genresList: [],
     };
-    try{
+    try {
         const response = await getBookId(idBook);
-        if(response){
+        if (response) {
             bookResponse = response;
             const imageList = await GetAllImage(response.idBook);
-            const thumbnail = imageList.find((image) =>image.icon);
-            const relatedImg =imageList.map((image) =>{
-                return !image.icon ? image.linkImg || image.dataImg : null
-            }).filter(Boolean);
-            bookResponse = { ...bookResponse, relatedImg: relatedImg as string[], thumbnail: thumbnail?.linkImg || thumbnail?.dataImg };
+            const thumbnail = imageList.find((image) => image.icon);
+            const relatedImg = imageList
+                .map((image) => {
+                    return !image.icon ? image.linkImg || image.dataImg : null;
+                })
+                .filter(Boolean);
+            bookResponse = {
+                ...bookResponse,
+                relatedImg: relatedImg as string[],
+                thumbnail: thumbnail?.linkImg || thumbnail?.dataImg,
+            };
             // Lấy tất cả các thể loại
             const genresList = await getGenreByID(response.idBook);
-            genresList.genreList.forEach((genre) =>{
-                const dataGenre : CategoryModel = {idCategory: genre.idCategory, nameCategory: genre.nameCategory}
-                bookResponse = {...bookResponse, genresList:[...bookResponse.genresList || [], dataGenre]};
-            })
+            genresList.genreList.forEach((genre) => {
+                const dataGenre: CategoryModel = {
+                    idCategory: genre.idCategory,
+                    nameCategory: genre.nameCategory,
+                };
+                bookResponse = {
+                    ...bookResponse,
+                    genresList: [...(bookResponse.genresList || []), dataGenre],
+                };
+            });
             return bookResponse;
-        }else {
+        } else {
             throw new Error("Sách không tồn tại");
-         }
-    }catch (error) {
-        console.error('Error: ', error);
+        }
+    } catch (error) {
+        console.error("Error: ", error);
         return null;
-     }
+    }
 }
 
-export async function getBookByIdCartItem(idCart: number): Promise<BookModel | null> {
+export async function getBookByIdCartItem(
+    idCart: number
+): Promise<BookModel | null> {
     const endpoint: string = `http://localhost:8080/cart-items/${idCart}/book`;
     try {
-         // Gọi phương thức request()
-      const response = await my_request(endpoint);
+        // Gọi phương thức request()
+        const response = await my_request(endpoint);
 
-      // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
-      if (response) {
-
-         // Trả về quyển sách
-         return response;
-      } else {
-         throw new Error("Sách không tồn tại");
-      }
-    }catch (error) {
-        console.log('Error: ', error);
-        return null;    
+        // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
+        if (response) {
+            // Trả về quyển sách
+            return response;
+        } else {
+            throw new Error("Sách không tồn tại");
+        }
+    } catch (error) {
+        console.log("Error: ", error);
+        return null;
     }
 }
 export async function getTotalNumberOfBooks(): Promise<number> {
-    const endpoint =  `http://localhost:8080/book/get-total`;
+    const endpoint = `http://localhost:8080/book/get-total`;
     try {
-       // Gọi phương thức request()
-       const response = await requestAdmin(endpoint);
-       // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
-       if (response) {
-          // Trả về số lượng cuốn sách
-          return response;
-       }
+        // Gọi phương thức request()
+        const response = await requestAdmin(endpoint);
+        // Kiểm tra xem dữ liệu endpoint trả về có dữ liệu không
+        if (response) {
+            // Trả về số lượng cuốn sách
+            return response;
+        }
     } catch (error) {
-       throw new Error("Lỗi không gọi được endpoint lấy tổng cuốn sách\n" + error);
+        throw new Error(
+            "Lỗi không gọi được endpoint lấy tổng cuốn sách\n" + error
+        );
     }
     return 0;
- }
+}
 
- export async function get3BestSellerBooks(): Promise<BookModel[]> {
-    const endpoint: string =  "http://localhost:8080/books?sort=soldQuantity,desc&size=3";
+export async function get3BestSellerBooks(): Promise<BookModel[]> {
+    const endpoint: string =
+        "http://localhost:8080/books?sort=soldQuantity,desc&size=3";
     let bookList = await getBook(endpoint);
- 
+
     // Use Promise.all to wait for all promises in the map to resolve
-    let newBookList = await Promise.all(bookList.result.map(async (book: any) => {
-       // Trả về quyển sách
-       const responseImg = await GetAllImage(book.idBook);
-       const thumbnail = responseImg.find(image => image.icon);
- 
-       return {
-          ...book,
-          thumbnail: thumbnail ? thumbnail.linkImg : null,
-       };
-    }));
- 
+    let newBookList = await Promise.all(
+        bookList.result.map(async (book: any) => {
+            // Trả về quyển sách
+            const responseImg = await GetAllImage(book.idBook);
+            const thumbnail = responseImg.find((image) => image.icon);
+
+            return {
+                ...book,
+                thumbnail: thumbnail ? thumbnail.linkImg : null,
+            };
+        })
+    );
+
     return newBookList;
- }
- 
+}

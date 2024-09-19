@@ -121,7 +121,7 @@ const ToolFilter: React.FC<ToolFilterProps> = (props) =>{
 									<em>None</em>
 								</MenuItem>
 								<MenuItem value={1}>Tên sách A - Z</MenuItem>
-								<MenuItem value={2}>Tên sách Z - A</MenuItem>
+								{/* <MenuItem value={2}>Tên sách Z - A</MenuItem> */}
 								<MenuItem value={3}>
 									<span className='d-inline-flex align-items-center'>
 										Giá tăng dần

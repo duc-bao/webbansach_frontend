@@ -183,8 +183,9 @@ export const ProfilePage: React.FC<ProfilePageProps> = (props) => {
 					}
 				})
 				.then((data) => {
-					const { jwtToken } = data;
-					localStorage.setItem("token", jwtToken);
+					const { token: jwt, refreshToken } = data;
+					localStorage.setItem("token", jwt);
+                	localStorage.setItem("refreshToken", refreshToken);
 
 					toast.success("Cập nhật ảnh đại diện thành công");
 					setPreviewAvatar(previewAvatar);

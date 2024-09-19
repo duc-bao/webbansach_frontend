@@ -187,7 +187,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                 {isToken() && (
                     <>
                         {/* <!-- Notifications --> */}
-                        <div className="dropdown">
+                        {/* <div className="dropdown">
                             <a
                                 className="text-reset me-3 dropdown-toggle hidden-arrow"
                                 href="#"
@@ -221,7 +221,7 @@ function Navbar({ keywordSearch, setKeywordSearch }: NavbarProps) {
                                     </a>
                                 </li>
                             </ul>
-                        </div>
+                        </div> */}
                         {/* <!-- Avatar --> */}
                         <div className="dropdown">
                             <a

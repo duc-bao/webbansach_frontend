@@ -65,7 +65,20 @@ export const UserTable: React.FC<UserTableProps> = (props) => {
     };
     const columns: GridColDef[] = [
         { field: "id", headerName: "ID", width: 50 },
-        { field: "username", headerName: "TÊN TÀI KHOẢN", width: 120 },
+        {
+            field: "userName",
+            headerName: "TÊN TÀI KHOẢN",
+            width: 120,
+            renderCell: (params) => {
+                const userName = params.row.userName;
+                const email = params.row.email;
+
+                const displayName =
+                    userName || (email ? email.split("@")[0] : "Unknown");
+
+                return <span>{displayName}</span>;
+            },
+        },
         {
             field: "role",
             headerName: "VAI TRÒ",

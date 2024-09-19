@@ -32,7 +32,7 @@ export async function getAllOrders(): Promise<OrderModel[]> {
              feePayment: data.feePayment,
              dateCreated: data.dateOrder,
              status: data.status,
-             user: responseUser.lastName,
+             user: responseUser.lastName ? responseUser.lastName : responseUser.email?.split("@")[0],
              fullName: data.fullName,
              note: data.note,
              payment: responsePayment.namePayment,

@@ -74,8 +74,12 @@ const OrderTable: React.FC<OrderTableProps> = (props) => {
 								: params.value === "Đang xử lý"
 								? "info"
 								: params.value === "Đang giao hàng"
+								? "primary"
+								: params.value === "Đợi xác nhận"
 								? "warning"
-								: "error"
+								: params.value === "Bị huỷ"
+								? "error"
+								: "default"  // Fallback color
 						}
 						variant='outlined'
 					/>

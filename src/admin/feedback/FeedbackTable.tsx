@@ -17,46 +17,64 @@ export const FeedbackTable: React.FC = (props) => {
 	// Tạo biến để lấy tất cả data
 	const [data, setData] = useState<FeedbackModel[]>([]);
 	useEffect(() => {
-		getAllFeedBack().then((response) => {
-			const feedbacks = response.map((feedback) => ({
-				...feedback,
-				id: feedback.idFeedback,
-			}));
-			setData(feedbacks);
+		const fetchData = async () => {
+		  try {
+			const feedbacks = await getAllFeedBack();
+			setData(feedbacks.map(feedback => ({
+			  ...feedback,
+			  id: feedback.idFeedback,
+			})));
 			setLoading(false);
-		});
-	}, [data]);
+		  } catch (error) {
+			console.error("Error fetching feedback:", error);
+			toast.error("Failed to load feedback data");
+			setLoading(false);
+		  }
+		};
+	
+		fetchData();
+	  }, []);
 
-	const handleChangeIsReaded = (idFeedback: any) => {
+	  const handleChangeIsReaded = async (idFeedback: any) => {
 		const token = localStorage.getItem("token");
-
-		const tmp = data.filter((feedback) => feedback.idFeedback);
-		if (tmp[0].readed === true) {
-			toast.warning("Feedback này đã duyệt rồi");
-			return;
+		const feedback = data.find((f) => f.idFeedback === idFeedback);
+	
+		if (!feedback) {
+		  toast.error("Feedback not found");
+		  return;
 		}
-
-		toast.promise(
-			fetch( `http://localhost:8080/feedback/update-feedback/${idFeedback}`, {
-				method: "PUT",
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			})
-				.then((response) => {
-					if (response.ok) {
-						toast.success("Duyệt thành công");
-					} else {
-						toast.error("Lỗi khi duyệt");
-					}
-				})
-				.catch((error) => {
-					toast.error("Lỗi khi duyệt");
-					console.log(error);
-				}),
-			{ pending: "Đang trong quá trình xử lý ..." }
-		);
-	};
+	
+		if (feedback.readed) {
+		  toast.warning("Feedback này đã duyệt rồi");
+		  return;
+		}
+	
+		try {
+		  const response = await fetch(
+			`http://localhost:8080/feedback/update-feedback/${idFeedback}`,
+			{
+			  method: "PUT",
+			  headers: {
+				Authorization: `Bearer ${token}`,
+			  },
+			}
+		  );
+	
+		  if (response.ok) {
+			toast.success("Duyệt thành công");
+			setData(prevData =>
+			  prevData.map(f =>
+				f.idFeedback === idFeedback ? { ...f, readed: true } : f
+			  )
+			);
+		  } else {
+			toast.error("Lỗi khi duyệt");
+		  }
+		} catch (error) {
+		  toast.error("Lỗi khi duyệt");
+		  console.error(error);
+		}
+	  };
 
 	const columns: GridColDef[] = [
 		{ field: "id", headerName: "ID", width: 50 },

@@ -86,14 +86,14 @@ const GenreTable : React.FC<GenreTableProps> = (props) =>{
                                 <EditOutlinedIcon></EditOutlinedIcon>
                             </IconButton>
                         </Tooltip>
-                        <Tooltip title = {"Xóa"}>
+                        {/* <Tooltip title = {"Xóa"}>
                             <IconButton 
                                color='error'
                                onClick={() => handleDeleteGenre(item.id)}
                             >
                                 <DeleteOutlineOutlined></DeleteOutlineOutlined>
                             </IconButton>
-                        </Tooltip>
+                        </Tooltip> */}
                     </div>
                 )
             }

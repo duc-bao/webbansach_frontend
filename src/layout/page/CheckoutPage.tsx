@@ -87,34 +87,31 @@ export const CheckoutPage: React.FC<CheckoutPageProps> = (props) => {
             // Khi thanh toán bằng vnpay
 		if (payment === 2) {
 			try {
-				const response = await fetch(
-						"http://localhost:8080/vnpay/create-payment?amount="+
-						props.totalPriceProduct,
-					{
-						method: "POST",
-						headers: {
-							Authorization: `Bearer ${token}`,
-							"content-type": "application/json",
-						},
-					}
-				);
-				if (!response.ok) {
-					throw new Error(`HTTP error! Status: ${response.status}`);
-				}
-				const paymentUrl = await response.text();
-
-				// Lưu order vào csdl
-				const isPayNow = true;
-				handleSaveOrder(request, isPayNow);
-
-				window.location.replace(paymentUrl);
+                await handleSaveOrder(request, true);    
+				
+                    const response = await fetch(
+                        `http://localhost:8080/vnpay/create-payment?amount=${props.totalPriceProduct}`,
+                        {
+                            method: "POST",
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                "content-type": "application/json",
+                            },
+                        }
+                    );
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! Status: ${response.status}`);
+                    }
+                    const paymentUrl = await response.text();
+                    window.location.replace(paymentUrl);
+                
 			} catch (error) {
 				console.log(error);
 			}
 		} else {
 			// Khi nhận hàng mới thanh toán
             
-			handleSaveOrder(request);
+			await handleSaveOrder(request);
 		}
     }
     const handleSaveOrder = (request:any, isPayNow?:boolean) =>{

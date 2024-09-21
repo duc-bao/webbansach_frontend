@@ -4,38 +4,45 @@ import { useAuth } from "../utils/AuthorizationContext";
 import { getIdUserByToken } from "../utils/JwtService";
 import { CheckoutSuccess } from "./components/CheckoutSucces";
 import { CheckoutFail } from "./components/CheckoutFail";
-
+import { toast } from "react-toastify";
 
 const CheckoutStatus: React.FC = () => {
-	const { isLoggedIn } = useAuth();
-	const navigation = useNavigate();
+    const { isLoggedIn } = useAuth();
+    const navigation = useNavigate();
 
-	useEffect(() => {
-		if (!isLoggedIn) {
-			navigation("/login");
-		}
-	});
+    useEffect(() => {
+        if (!isLoggedIn) {
+            navigation("/login");
+        }
+    });
 
-	const location = useLocation();
-	const [isSuccess, setIsSuccess] = useState(false);
+    const location = useLocation();
+    const [isSuccess, setIsSuccess] = useState<boolean | null>(null);
 
-	useEffect(() => {
+    useEffect(() => {
         const fetchData = async () => {
             const token = localStorage.getItem("token");
             try {
-                const response = await fetch("http://localhost:8080/vnpay/payment_info", {
-                    method: "POST",
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(parseURLParams(location.search)),
-                });
+                const response = await fetch(
+                    "http://localhost:8080/vnpay/payment_info",
+                    {
+                        method: "POST",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(parseURLParams(location.search)),
+                    }
+                );
                 const data = await response.json();
                 console.log(location.search);
                 if (data.status === "success") {
                     setIsSuccess(true);
+                    localStorage.removeItem("cart");
+                    toast.success("Thanh toán thành công");
                 } else if (data.status === "failed") {
+                    setIsSuccess(false);
+                    toast.error("Thanh toán thất bại");
                     await fetch("http://localhost:8080/order/cancel-order", {
                         method: "PUT",
                         headers: {
@@ -51,15 +58,17 @@ const CheckoutStatus: React.FC = () => {
                 console.error("Error fetching data:", error);
             }
         };
-    
+
         fetchData();
     }, [location.search]);
-
-	return <>{isSuccess ? <CheckoutSuccess /> : <CheckoutFail />}</>;
+    if (isSuccess === null) {
+        return <div>Đang xử lý thanh toán...</div>;
+    }
+    return <>{isSuccess ? <CheckoutSuccess /> : <CheckoutFail />}</>;
 };
-    function parseURLParams(search: string) {
-        const params = new URLSearchParams(search);
-        return {
+function parseURLParams(search: string) {
+    const params = new URLSearchParams(search);
+    return {
         vnp_Amount: params.get("vnp_Amount"),
         vnp_BankCode: params.get("vnp_BankCode"),
         vnp_BankTranNo: params.get("vnp_BankTranNo"),
@@ -72,8 +81,7 @@ const CheckoutStatus: React.FC = () => {
         vnp_TransactionStatus: params.get("vnp_TransactionStatus"),
         vnp_TxnRef: params.get("vnp_TxnRef"),
         vnp_SecureHash: params.get("vnp_SecureHash"),
-        };
-    }
+    };
+}
 
 export default CheckoutStatus;
-

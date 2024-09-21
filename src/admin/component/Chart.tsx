@@ -277,6 +277,9 @@ export const Chart: React.FC<ChartProps> = (props) => {
 	const handleChartClick = () => {
 		navigate("/admin/order");
 	  };
+	  const handleChartClick1 = () => {
+		navigate("/admin/book");
+	  };
 	return (
 		<div className='conatiner p-4 '>
 			<div className='row'>
@@ -329,7 +332,7 @@ export const Chart: React.FC<ChartProps> = (props) => {
 					</div>
 				</div>
 				<div className='col-lg-6 col-md-12 col-sm-12'>
-					<div className='shadow-4 rounded p-5 mb-5 bg-light'>
+					<div className='shadow-4 rounded p-5 mb-5 bg-light' onClick={() => handleChartClick1()}>
 						<h4 className='text-black text-center mb-3'>
 							Top 3 cuốn sách được mua nhiều nhất
 							<hr />

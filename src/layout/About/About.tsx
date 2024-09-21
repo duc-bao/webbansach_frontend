@@ -7,22 +7,22 @@ function About() {
         <div className="w-100 h-100 d-flex align-items-center justify-content-center flex-column m-5">
             <div className="w-50 h-50 p-3 rounded-5 shadow-4-strong bg-light">
                 <h3 className="text-center text-black">
-                    Giới thiệu về ZoiBook
+                    Giới thiệu về BaoShop
                 </h3>
                 <hr />
                 <div className="row">
                     <div className="col-lg-8">
                         <p>
-                            <strong>Tên website: </strong>ZoiBook
+                            <strong>Tên website: </strong>BaoShop
                         </p>
                         <p>
-                            <strong>Địa chỉ: </strong>Hoàng Mai Hà N
+                            <strong>Địa chỉ: </strong>Hoàng Mai Hà Nội
                         </p>
                         <p>
-                            <strong>Số điện thoại: </strong>0813535314
+                            <strong>Số điện thoại: </strong>0395601044
                         </p>
                         <p>
-                            <strong>Email: </strong>zoibook-store@gmail.com
+                            <strong>Email: </strong>baoshop@gmail.com
                         </p>
                     </div>
                     <div className="col-lg-4">
